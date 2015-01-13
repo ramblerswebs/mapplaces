@@ -5,6 +5,50 @@
  */
 function loadPlaceInfo($url)
 {
+    ajax($url, "", "placeinfo");
+}
+
+
+function placeReport($gr)
+{
+    $url = "?option=report";
+    $params = "gridref=" + $gr;
+    ajax($url, $params, "placereport");
+}
+function processReport()
+{
+    $url = "?option=processReport";
+    var $ids = ['Report_Text', 'Report_New', 'Report_Location'];
+    $params = createParams($ids);
+    ajax($url, $params, "placereport");
+}
+function createParams($array)
+{
+    for (var i = 0; i < $array.length; i++) {
+        $name = $array[i];
+        el = document.getElementById($name);
+        if (el.type) {
+            switch (el.type) {
+                case 'checkbox':
+                    $array[i] = $array[i] + "=" + document.getElementById($name).checked;
+                    break;
+                case 'radio':
+                    $array[i] = $array[i] + "=" + document.getElementById($name).checked;
+                    break;
+                default:
+                    $array[i] = $array[i] + "=" + document.getElementById($name).value;
+            }
+        }
+    }
+    return $array.join("&");
+}
+function cancelReport()
+{
+    $div = "placereport";
+    document.getElementById($div).innerHTML = "Cancelled";
+}
+function ajax($url, $params, $div)
+{
     var xmlhttp;
     if (window.XMLHttpRequest)
     {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -18,12 +62,17 @@ function loadPlaceInfo($url)
     {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
         {
-            document.getElementById("placeinfo").innerHTML = xmlhttp.responseText;
+            document.getElementById($div).innerHTML = xmlhttp.responseText;
         }
     }
-    xmlhttp.open("GET", $url, true);
-    xmlhttp.send();
+    xmlhttp.open("POST", $url, true);
+    //Send the proper header information along with the request
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.setRequestHeader("Content-length", $params.length);
+    xmlhttp.setRequestHeader("Connection", "close");
+    xmlhttp.send($params);
 }
+
 
 function addPlace($list, $gr, $no, $lat, $long)
 {
@@ -39,7 +88,7 @@ function onClick(e) {
     loadPlaceInfo("index.php?option=details&id=" + this.options.gridref);
 }
 
- function photos(gr) {
-   page="http://www.geograph.org.uk/gridref/"+gr; 
-   window2=open(page,"photos","scrollbars=yes,width=600,height=600,menubar=yes,resizable=yes,status=yes");
-   }
+function photos($gr) {
+    page = "http://www.geograph.org.uk/gridref/" + $gr;
+    window2 = open(page, "photos", "scrollbars=yes,width=600,height=600,menubar=yes,resizable=yes,status=yes");
+}

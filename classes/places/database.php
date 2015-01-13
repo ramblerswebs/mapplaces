@@ -114,6 +114,7 @@ class PlacesDatabase extends Database {
     }
 
     function getPlaces() {
+        $markers="";
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
         $query = "SELECT gridref,latitude,longitude,COUNT(*) as count FROM places WHERE dateused < '[todays]' GROUP BY gridref";
@@ -131,12 +132,11 @@ class PlacesDatabase extends Database {
 
                 //  echo "var marker = L.marker([".$lat.", ".$long."]);";
                 // echo " markerList.push(marker);\r\n";
-                echo "addPlace(markerList ,\"" . $gr . "\", " . $no . ", " . $lat . ", " . $long . ");\r\n";
+                $markers.= "addPlace(markerList ,\"" . $gr . "\", " . $no . ", " . $lat . ", " . $long . ");\r\n";
             }
-            echo "markers.addLayers(markerList);
-		map.addLayer(markers);";
             unset($result);
             parent::freeResult();
+            return $markers;
         }
     }
 

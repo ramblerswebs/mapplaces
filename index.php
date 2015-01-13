@@ -40,6 +40,17 @@ if ($opts->gets("option") == "display") {
     $display = new PlacesDisplay($db);
     $display->display();
 }
+if ($opts->gets("option") == "report") {
+    //echo "REPORT";
+    echo "<script type='text/javascript'>alert('message');</script>";
+    $form = new PlacesReportform("sk123456");
+    $form->display();
+}
+if ($opts->gets("option") == "processReport") {
+
+    $form = new PlacesReportform("sk123456");
+    $form->process();
+}
 if ($opts->gets("option") == null) {
     $homepage = file_get_contents('splash.html');
     echo $homepage;

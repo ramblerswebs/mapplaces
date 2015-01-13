@@ -19,6 +19,8 @@ class Options {
         }
         foreach ($_POST as $key => $value) {
             $this->posts[$key] = htmlspecialchars($value);
+            echo $value;
+            echo $key;
         }
     }
     public function getOptions(){
