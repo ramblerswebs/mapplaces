@@ -18,16 +18,16 @@ class Database {
     }
 
     function connect() {
-       // echo 'Connecting' . "\n";
+        // echo 'Connecting' . "\n";
         $this->connected = False;
         $host = $this->config->host;
         $database = $this->config->database;
         $user = $this->config->user;
         $password = $this->config->password;
-       // echo '<p>Host - ' . $host . "</p>\n";
-       // echo '<p>Database - ' . $database . "</p>\n";
-      //  echo '<p>User - ' . $user . "</p>\n";
-      //  echo '<p>Password - ' . $password . "</p>\n";
+        // echo '<p>Host - ' . $host . "</p>\n";
+        // echo '<p>Database - ' . $database . "</p>\n";
+        //  echo '<p>User - ' . $user . "</p>\n";
+        //  echo '<p>Password - ' . $password . "</p>\n";
         $this->mysqli = new mysqli($host, $user, $password, $database);
         if ($this->mysqli->connect_error) {
             $this->status = 'Error connecting to database (' . $this->mysqli->connect_errno . ') '
@@ -42,16 +42,22 @@ class Database {
         }
     }
 
-    function createTable($name, $sql) {
-        if (!$this->tableExists($name)) {
+    function error() {
+        return $this->mysqli->error;
+    }
 
-            $res = $this->mysqli->Query($sql);
-            if ($res) {
-                //$this->Msg("Table 'baseline' created");
-                return true;
-            } else {
-                return false;
-                //$this->ErrorMsg("Table creation " . $name . " FAILED");
+    function createTables($sql) {
+        $res = $this->mysqli->Query("SHOW TABLES");
+        if ($res->num_rows == 0) {
+            echo "Creating tables<br/>";
+            foreach ($sql as $value) {
+                echo $value . "<br/>";
+                $res = $this->mysqli->Query($value);
+                if ($res) {
+                    //$this->Msg("Table 'baseline' created");
+                } else {
+                    echo "SQL failed " . $value . " Error: " . $this->mysqli->error;
+                }
             }
         }
     }
@@ -61,32 +67,29 @@ class Database {
         if ($this->result) {
             return true;
         } else {
-            Logfile::writeError( $this->mysqli->error);
+            Logfile::writeError($this->mysqli->error);
             return false;
         }
     }
-    function getResult(){
+
+    function getResult() {
         return $this->result;
     }
+
     function freeResult() {
         $this->result->close();
         unset($this->result);
     }
 
     function insertRecord($table, $names, $values) {
-
-        // $query = "Insert into baseline (filepath, hash, state, date_added, date_checked)
-	//		values ('" . addslashes($filepath) . "', '$hash', " . self::STATE_NEW . ", NOW(), 0)";
-        $query="Insert into ".$table;
+        $query = "Insert into " . $table;
         $query.=self::createNames($names);
         $query.=self::createValues($values);
         $result = $this->mysqli->query($query);
         if ($result === false) {
-           // $this->ErrorMsg("Unable to add NEW entry for " . $filepath);
-            return 2;
+            return false;
         }
-       // $this->Msg("NEW: " . $filepath);
-        return 0; // we're done for this file
+        return true; // we're done for this file
     }
 
     private function tableExists($table) {

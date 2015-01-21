@@ -8,17 +8,22 @@ function loadPlaceInfo($url)
     ajax($url, "", "placeinfo");
 }
 
-
-function placeReport($gr)
+function reportDescription($gr)
 {
     $url = "?option=report";
-    $params = "gridref=" + $gr;
+    $params = "gridref=" + $gr+ "&type=description";
+    ajax($url, $params, "placereport");
+}
+function reportGridref($gr)
+{
+    $url = "?option=report";
+    $params = "gridref=" + $gr+ "&type=gridref";
     ajax($url, $params, "placereport");
 }
 function processReport()
 {
     $url = "?option=processReport";
-    var $ids = ['Report_Text', 'Report_New', 'Report_Location'];
+    var $ids = ['Report_Text', 'Report_Type', 'Report_GR'];
     $params = createParams($ids);
     ajax($url, $params, "placereport");
 }
@@ -74,21 +79,20 @@ function ajax($url, $params, $div)
 }
 
 
-function addPlace($list, $gr, $no, $lat, $long)
+function addPlace($list, $gr, $no, $lat, $long,$icon)
 {
-    var marker = L.marker([$lat, $long], {gridref: $gr});
-    marker.bindPopup("<b>" + $gr + "</b> (" + $no + " )</a>");
+    var marker = L.marker([$lat, $long], {icon: $icon,gridref: $gr, no: $no});
+    marker.bindPopup("<b>" + $gr + "</b>");
     marker.on('click', onClick);
     $list.push(marker);
 }
 function onClick(e) {
-    // console.log(this.options);
-    // window.open(this.options);
-    console.log(this.options.gridref);
-    loadPlaceInfo("index.php?option=details&id=" + this.options.gridref);
+   // console.log(this.options.gridref);
+   // console.log(this.options.no);
+    loadPlaceInfo("index.php?option=details&id=" + this.options.gridref+"&no="+this.options.no);
 }
 
 function photos($gr) {
     page = "http://www.geograph.org.uk/gridref/" + $gr;
-    window2 = open(page, "photos", "scrollbars=yes,width=600,height=600,menubar=yes,resizable=yes,status=yes");
+    window2 = open(page, "photos", "scrollbars=yes,width=990,height=480,menubar=yes,resizable=yes,status=yes");
 }

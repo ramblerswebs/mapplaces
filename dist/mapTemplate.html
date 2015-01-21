@@ -47,7 +47,7 @@
                 position: 'topright',
                 showMarker: false
             }).addTo(map);
-            map.addControl(new L.Control.Layers({'OSM': osm, 'OSM Terrain': osm2, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2}, {}));
+            mapLayers = {'OSM': osm, 'OSM Terrain': osm2, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2};
             var progress = document.getElementById('progress');
             var progressBar = document.getElementById('progress-bar');
 
@@ -63,15 +63,44 @@
                     progress.style.display = 'none';
                 }
             }
+            var star0 = L.icon({
+                iconUrl: 'images/marker-icon-red.png',
+                iconSize: [13, 20]
+            });
+              var star1 = L.icon({
+                iconUrl: 'images/5blue.png',
+                iconSize: [13, 20]
+            });
+            var star2 = L.icon({
+                iconUrl: 'images/5blue.png',
+                iconSize: [17, 25]
+            });
+            var star3 = L.icon({
+                iconUrl: 'images/5blue.png',
+                iconSize: [19, 30]
+            });
+            var star4 = L.icon({
+                iconUrl: 'images/5blue.png',
+                iconSize: [22, 35]
+            });
+            var star5 = L.icon({
+                iconUrl: 'images/5blue.png',
+                iconSize: [25, 41]
+            });
 
-            var markers = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar});
+            var markersCG = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar});
 
             var markerList = [];
+  
             // [[Add markers here]]
 
-            map.addLayer(markers);
-            markers.addLayers(markerList);
-            map.addLayer(markers);</script>
+            markersCG.addLayers(markerList);
+            map.addLayer(markersCG);
+        
+            
+            map.addControl(new L.Control.Layers(mapLayers));
+
+        </script>
         <div class="scroll" id="placeinfo"></div>
     </body>
 </html>

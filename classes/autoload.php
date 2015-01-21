@@ -18,6 +18,7 @@ function __autoload($class_name) {
         }
     }
     $file .= ".php";
+   // echo $file."<br />";
     if (file_exists($file)) {
         require_once( $file );
     } else {

@@ -16,11 +16,13 @@ class Options {
 
         foreach ($_GET as $key => $value) {
             $this->gets[$key] = htmlspecialchars($value);
+          //  echo $value;
+          //  echo $key;
         }
         foreach ($_POST as $key => $value) {
             $this->posts[$key] = htmlspecialchars($value);
-            echo $value;
-            echo $key;
+          //  echo $value;
+          //  echo $key;
         }
     }
     public function getOptions(){
@@ -37,7 +39,11 @@ class Options {
     }
 
     public function posts($name) {
-        return $this->posts[$name];
+        if (isset($this->posts[$name])){
+             return $this->posts[$name];
+        } else {
+            return null;
+        }
     }
 
 }

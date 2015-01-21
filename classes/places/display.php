@@ -14,14 +14,16 @@
 class PlacesDisplay {
 
     private $db;
+    private $displayRejected;
 
-    function __construct($database) {
+    function __construct($database,$displayRejected) {
         $this->db = $database;
+        $this->displayRejected=$displayRejected;
     }
 
     function display() {
         $template = new Template("dist/mapTemplate.html");
-        $points = $this->db->getPlaces();
+        $points = $this->db->getPlaces($this->displayRejected);
         $template->replaceString("// [[Add markers here]]", $points);
         $template->insertTemplate();
     }

@@ -22,7 +22,7 @@ class PlacesUpdate {
         Logfile::writeWhen(" ");
         Logfile::writeWhen("Lastread: " . $this->area->lastread);
         $walks = $feed->json;
-        $stats = new RamblersFeedStatistics($walks);
+        $stats = new RamblersFeedStatistics($this->db,$this->area,$walks);
         $stats->Display();
         Logfile::writeWhen("Walkid, Type, Description");
 
@@ -56,11 +56,11 @@ class PlacesUpdate {
                 if ($point->typeString == "Meeting") {
 
                     Logfile::writeWhen($walk->id . ", Meet , '" . $desc . "'");
-                    $this->db->addPlace(0, $walk, $point);
+                    $this->db->addPlace(PlacesEnums::MeetingPoint, $walk, $point);
                 }
                 if ($point->typeString == "Start") {
                     Logfile::writeWhen($walk->id . ", Start, '" . $desc . "'");
-                    $this->db->addPlace(1, $walk, $point);
+                    $this->db->addPlace(PlacesEnums::StartingPoint, $walk, $point);
                 }
             }
         }
