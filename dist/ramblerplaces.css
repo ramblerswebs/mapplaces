@@ -14,15 +14,15 @@
 /* pantone5565 '#8BA69C';           */
 /* pantone7474 '#007A87';           */
 
-body {;
-  font-family: Arial, Helvetica, sans-serif;
+body {
+      font-family: Arial, Helvetica, sans-serif;
 }
 
 .scroll {
-  width: 800px;
-   height: 200px;
+    width: 800px;
+    height: 200px;
     background: #CCCCCC;
-   overflow: scroll;
+    overflow: scroll;
 }
 .scroll::-webkit-scrollbar {
     width: 12px;
@@ -37,37 +37,43 @@ body {;
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
+.small{
+
+    font-size: small;
+    display: inline
+}
+
+
 #placereport {
     background-color: #007A87;
     color: #FFFFFF;
 }
-#reportphotos {
-  float: right;
-  color: #FFFFFF;
-  margin: 4px;
+#reportphotos ,#reportmap {
+    color: #FFFFFF;
+    margin: 4px;
 }
-#reportoptions {
-  float: right;
-  color: #FFFFFF;
+#reportoptions, #reportlinks {
+    float: right;
+    color: #FFFFFF;
 }
-#reportdesc, #reportgr,#reportphotos {
-  margin: 4px;
-  background-color: #782327;
-  border-radius: 7px;
-  color: #FFFFFF
+#reportdesc, #reportgr,#reportphotos,#reportmap {
+    margin: 4px;
+    background-color: #782327;
+    border-radius: 7px;
+    color: #FFFFFF
 }
-#reportdesc a, #reportgr a, #reportphotos a{
-  margin:4px;
-  color: #FFFFFF;
-  text-decoration: none
+#reportdesc a, #reportgr a, #reportphotos a, #reportmap a{
+    margin:4px;
+    color: #FFFFFF;
+    text-decoration: none
 }
-#reportdesc a:hover, #reportgr a:hover, #reportphotos a:hover{
-  color: #DDDDDD;
-  text-decoration: none
+#reportdesc a:hover, #reportgr a:hover, #reportphotos a:hover, #reportmap a:hover{
+    color: #DDDDDD;
+    text-decoration: none
 }
 
-#reportphotos{
-   background-color: #206C49;
+#reportphotos, #reportmap{
+    background-color: #206C49;
 
 }
 

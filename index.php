@@ -1,4 +1,5 @@
 <?php
+
 // options
 // index.php normal splash page
 // index.php?option=display map displat page
@@ -24,65 +25,55 @@ $db->Connect();
 //echo $db->status;
 $opts = new Options();
 Logfile::create("logfiles/testing.log");
-
-if ($opts->gets("option") == "areas") {
-    $areas = new RamblersOrganisationAreas();
-    $file = "data/areacodes.xml";
-    $values = $areas->readAreaCodes($file);
-    // print_r($values);
-    foreach ($values as $value) {
-        echo "............................";
-        echo $value->code;
-        echo "  ";
-        echo $value->description;
-        echo "<br />";
-    }
-    $db->loadAreas($values);
+switch ($opts->gets("option")) {
+    case "areas":
+        $areas = new RamblersOrganisationAreas();
+        $file = "data/areacodes.xml";
+        $values = $areas->readAreaCodes($file);
+        // print_r($values);
+        foreach ($values as $value) {
+            echo "............................";
+            echo $value->code;
+            echo "  ";
+            echo $value->description;
+            echo "<br />";
+        }
+        $db->loadAreas($values);
+        break;
+    case "display":
+        $displayRejected = $opts->gets("rejected") == "1";
+        $display = new PlacesDisplay($db, $displayRejected);
+        $display->display();
+        break;
+    case "report":
+        $gr = $opts->posts("gridref");
+        $reporttype = $opts->posts("type");
+        $form = new PlacesReportform($db, $gr, $reporttype);
+        $form->display();
+        break;
+    case "processReport":
+        $gr = $opts->posts("Report_GR");
+        $reporttype = $opts->posts("Report_Type");
+        $description = $opts->posts("Report_Text");
+        $form = new PlacesReportform($db, $gr, $reporttype);
+        $form->process($description);
+        break;
+    case "details":
+        $display = new PlacesDetails($db);
+        $display->display($opts->gets("id"), $opts->gets("no"));
+        break;
+    case "importcsv":
+        $file = $opts->gets("file");
+        $import = new PlacesImportcsv($db);
+        $import->process($file);
+        break;
+    case "statistics":
+        $stats = new PlacesStatistics($db);
+        $stats->display();
+        break;
+    default:
+        $homepage = file_get_contents('splash.html');
+        echo $homepage;
 }
-//if ($opts->gets("option") == "getwalks") {
-//    $nextarea = $db->getNextArea();
-//    $update = new PlacesUpdate($db, $nextarea);
-//    $update->processFeed();
-//}
-if ($opts->gets("option") == "display") {
-    $displayRejected = $opts->gets("rejected") == "1";
-    $display = new PlacesDisplay($db, $displayRejected);
-    $display->display();
-}
-if ($opts->gets("option") == "report") {
-    //echo "REPORT";
-    $gr = $opts->posts("gridref");
-    $reporttype = $opts->posts("type");
-    $form = new PlacesReportform($db,$gr, $reporttype);
-    $form->display();
-}
-if ($opts->gets("option") == "processReport") {
-    $gr = $opts->posts("Report_GR");
-    $reporttype = $opts->posts("Report_Type");
-    $description = $opts->posts("Report_Text");
-    $form = new PlacesReportform($db,$gr, $reporttype);
-    $form->process($description);
-}
-if ($opts->gets("option") == null) {
-    $homepage = file_get_contents('splash.html');
-    echo $homepage;
-}
-if ($opts->gets("option") == "details") {
-
-    $display = new PlacesDetails($db);
-    // echo $opts->gets("no");
-    $display->display($opts->gets("id"), $opts->gets("no"));
-}
-if ($opts->gets("option") == "importcsv") {
-    $file = $opts->gets("file");
-    $import = new PlacesImportcsv($db);
-    $import->process($file);
-}
-if ($opts->gets("option") == "statistics") {
-    
-    $stats = new PlacesStatistics($db);
-    $stats->display();
-}
-
 $db->closeConnection();
-//echo $db->status;
+

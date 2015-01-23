@@ -327,7 +327,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         if ($ok == true) {
             $result = parent::getResult();
             /* fetch object array */
-            echo "<p><b>Used         Description</b></p>";
+            echo "<p><b>Description</b> [Date used]</p>";
             while ($row = $result->fetch_row()) {
                 //  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
                 $desc = $row[0];
@@ -335,7 +335,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                     $desc = "[No description]";
                 }
                 $lastread = $row[1];
-                echo $lastread . "  " . $desc . "<br/>";
+                echo  "  " . $desc ." <div class='small'>[". $lastread ."]</div><br/>";
             }
             unset($result);
             parent::freeResult();

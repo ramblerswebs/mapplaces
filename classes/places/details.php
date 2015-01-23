@@ -18,7 +18,11 @@ class PlacesDetails {
         echo "<div id='reportdesc'><a href=\"javascript:reportDescription('" . $id . "') \">Update Description</a></div>";
         echo "<div id='reportgr'><a href=\"javascript:reportGridref('" . $id . "') \">Incorrect Grid Ref</a></div>";
         echo "</div>";
-        echo "<div id='reportphotos'><a href=\"javascript:photos('" . $id . "') \">Photos/OS Map</a></div>";
+         echo "<div id='reportlinks'>";
+        echo "<div id='reportphotos'><a href=\"javascript:photos('" . $id . "') \">Photos of area</a></div>";
+       echo "<div id='reportmap'><a href=\"javascript:streetmap('" . $id . "') \">Streetmap</a></div>";
+   //     echo "<div id='reportmap'><a href='http://www.streetmap.co.uk/grid/".$id."&Z=115' target='_blank' >Streetmap</a></div>";
+        echo "</div>";
         $image = $this->getStarsImage($no);
         if ($image != null) {
             echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
