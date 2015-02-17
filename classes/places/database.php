@@ -135,8 +135,9 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
     }
 
     function updateAreaStatistics($area, $json) {
+        $jsonstring=parent::escapeString($json);
         $query = "UPDATE `areas` SET `stats`='[value-1]' WHERE code = '[value-2]'";
-        $query = str_replace("[value-1]", $json, $query);
+        $query = str_replace("[value-1]", $jsonstring, $query);
         $query = str_replace("[value-2]", $area->code, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -146,13 +147,15 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
     function addPlace($type, $walk, $point) {
         $id = $walk->id;
-        // delete walk if already there
-        $query = "DELETE FROM places WHERE walkid = " . $id;
-        // insert new record
+        // delete walk/type if already there
+        $query = "DELETE FROM places WHERE walkid = [id] AND type = [type]";
+        $query = str_replace("[id]", $id, $query);
+        $query = str_replace("[type]", $type, $query);
         $ok = parent::runQuery($query);
         if ($ok == false) {
             $this->addErrorLog(parent::error());
         }
+        // insert new record
         $extras = new PlacesExtras;
         $extras->group = $walk->groupCode;
         $extras->postcode = $point->postcode;
@@ -205,8 +208,6 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $latitude = $row[3];
                 $longitude = $row[4];
                 $no = $row[5];
-                $score = 1;
-
                 $this->addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude);
             }
         } else {
@@ -335,7 +336,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                     $desc = "[No description]";
                 }
                 $lastread = $row[1];
-                echo  "  " . $desc ." <div class='small'>[". $lastread ."]</div><br/>";
+                echo "  " . $desc . " <div class='small'>[" . $lastread . "]</div><br/>";
             }
             unset($result);
             parent::freeResult();

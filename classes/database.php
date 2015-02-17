@@ -124,5 +124,8 @@ class Database {
         $out = substr($out, 0, -3) . ") ";
         return $out;
     }
+    function escapeString($text){
+        return $this->mysqli->escape_string($text);
+    }
 
 }

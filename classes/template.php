@@ -1,7 +1,4 @@
 <?php
-
-
-
 /**
  * Description of inserthtml
  *
