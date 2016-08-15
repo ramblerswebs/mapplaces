@@ -7,14 +7,17 @@
  */
 class PlacesDatabase extends Database {
 
-    //put your code here
-    private $tables = ["errorlog", "areas", "places"];
-    private $sql = ["CREATE TABLE `areas` (
-  `code` char(2) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `lastread` date DEFAULT '2000-01-01',
-  `stats` blob NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+//put your code here
+    private $tables = ["errorlog", "groups", "places"];
+    private $sql = ["CREATE TABLE `groups` (
+  `code` text NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `description` varchar(2560) NOT NULL,
+  `scope` text NOT NULL,
+  `url` varchar(500) NOT NULL,
+  `latitude` float NOT NULL,
+  `longitude` float NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;        
 ", "
 CREATE TABLE `errorlog` (
 `id` int(11) NOT NULL,
@@ -39,8 +42,8 @@ CREATE TABLE `places` (
   `dateused` date DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 ", "
-ALTER TABLE `areas`
- ADD PRIMARY KEY (`code`), ADD UNIQUE KEY `code` (`code`), ADD KEY `code_2` (`code`);
+ALTER TABLE `groups`
+  ADD UNIQUE KEY `codeindex` (`code`(4));
 ", "
 ALTER TABLE `errorlog`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `id` (`id`);
@@ -54,19 +57,19 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;
 ALTER TABLE `places`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
-    function __construct($dbconfig) {
+    public function __construct($dbconfig) {
         parent::__construct($dbconfig);
     }
 
-    function loadAreas($areas) {
-        // clear area table
-        $query = "TRUNCATE TABLE `areas`";
+    public function storeGroups($groups) {
+// clear area table
+        $query = "TRUNCATE TABLE `groups`";
         $ok = parent::runQuery($query);
         if ($ok) {
-            foreach ($areas as $area) {
-                $names = $area->getNames();
-                $values = $area->getValues();
-                $ok = parent::insertRecord("areas", $names, $values);
+            foreach ($groups as $group) {
+                $names = $group->getNames();
+                $values = $group->getValues();
+                $ok = parent::insertRecord("groups", $names, $values);
                 if ($ok) {
                     
                 } else {
@@ -76,18 +79,25 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         } else {
             $this->addErrorLog(parent::error());
         }
-        // load areas
+// load areas
     }
 
-    function getNextArea() {
-        $query = "SELECT * FROM areas ORDER BY lastread ASC LIMIT 1";
+    public function getGroups() {
+        $query = "SELECT * FROM groups ORDER BY code";
         $ok = parent::runQuery($query);
-        $area = null;
+        $groups = array();
         if ($ok) {
             while ($row = parent::getResult()->fetch_assoc()) {
-                printf($row["lastread"] . " " . $row["code"] . $row["description"] . $row["lastread"]);
-                $area = new RamblersOrganisationArea($row["code"], $row["description"]);
-                $area->lastread = $row["lastread"];
+
+                $group = new RamblersOrganisationGroup();
+                $group->setCode($row["code"]);
+                $group->setName($row["name"]);
+                $group->setDescription($row["description"]);
+                $group->setScope($row["scope"]);
+                $group->setUrl($row["url"]);
+                $group->setLatitude($row["latitude"]);
+                $group->setLongitude($row["longitude"]);
+                $groups[] = $group;
             }
         } else {
             $this->addErrorLog(parent::error());
@@ -96,58 +106,12 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
         /* free result set */
         parent::freeResult();
-        return $area;
+        return $groups;
     }
-
-    function getAreaJson() {
-        $query = "SELECT * FROM areas ORDER BY code";
-        $ok = parent::runQuery($query);
-        $areas = array();
-        if ($ok) {
-            while ($row = parent::getResult()->fetch_assoc()) {
-                printf($row["lastread"] . " " . $row["code"] . " - " . $row["description"] . "<br />");
-                $json = $row["stats"];
-                if ($json != "") {
-                    $areas[$row["code"] . " - " . $row["description"]] = json_decode($json);
-                } else {
-                    $areas[$row["code"] . " - " . $row["description"]] = NULL;
-                }
-            }
-        } else {
-            $this->addErrorLog(parent::error());
-        }
-
-        /* free result set */
-        parent::freeResult();
-        return $areas;
-    }
-
-    function updateAreaLastreadDate($area) {
-        $query = "UPDATE `areas` SET `lastread`='[value-1]' WHERE code = '[value-2]'";
-        $today = new DateTime("now");
-        $todays = $today->format("Y-m-d");
-        $query = str_replace("[value-1]", $todays, $query);
-        $query = str_replace("[value-2]", $area->code, $query);
-        $ok = parent::runQuery($query);
-        if (!$ok) {
-            $this->addErrorLog(parent::error());
-        }
-    }
-
-    function updateAreaStatistics($area, $json) {
-        $jsonstring=parent::escapeString($json);
-        $query = "UPDATE `areas` SET `stats`='[value-1]' WHERE code = '[value-2]'";
-        $query = str_replace("[value-1]", $jsonstring, $query);
-        $query = str_replace("[value-2]", $area->code, $query);
-        $ok = parent::runQuery($query);
-        if (!$ok) {
-            $this->addErrorLog(parent::error());
-        }
-    }
-
-    function addPlace($type, $walk, $point) {
+  
+    public function addPlace($type, $walk, $point) {
         $id = $walk->id;
-        // delete walk/type if already there
+// delete walk/type if already there
         $query = "DELETE FROM places WHERE walkid = [id] AND type = [type]";
         $query = str_replace("[id]", $id, $query);
         $query = str_replace("[type]", $type, $query);
@@ -155,7 +119,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         if ($ok == false) {
             $this->addErrorLog(parent::error());
         }
-        // insert new record
+// insert new record
         $extras = new PlacesExtras;
         $extras->group = $walk->groupCode;
         $extras->postcode = $point->postcode;
@@ -173,24 +137,31 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         $names[] = "latitude";
         $names[] = "extras";
         $names[] = "dateused";
+        $names[] = "score";
+        $gr=PlacesFunctions::checkGridRef($point->gridRef);
         $values = array();
         $values[] = $id;
         $values[] = $type;
         $values[] = $point->description;
-        $values[] = $point->gridRef;
+        $values[] = $gr;
         $values[] = $point->easting;
         $values[] = $point->northing;
         $values[] = $point->longitude;
         $values[] = $point->latitude;
         $values[] = json_encode($extras);
         $values[] = $walk->date;
+        $score = 1;
+        if (strlen($gr) <> 8) {
+            $score = -1;
+        }
+        $values[] = $score;
         $ok = parent::insertRecord("places", $names, $values);
         if (!$ok) {
             $this->addErrorLog(parent::error());
         }
     }
 
-    function addReport($type, $gridref, $score, $description) {
+    public function addReport($type, $gridref, $score, $description) {
         $query = "SELECT gridref,easting,northing,latitude,longitude,SUM(score) as total FROM places WHERE gridref = '[gridref]' GROUP BY gridref";
         $query = str_replace("[gridref]", $gridref, $query);
         $ok = parent::runQuery($query);
@@ -201,7 +172,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $result = parent::getResult();
             /* fetch object array */
             while ($row = $result->fetch_row()) {
-                //  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
+//  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
                 $gr = $row[0];
                 $easting = $row[1];
                 $northing = $row[2];
@@ -217,7 +188,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         parent::freeResult();
     }
 
-    function addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude) {
+    public function addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude) {
         if ($gridref == NULL) {
             $gridref = "";
         }
@@ -254,11 +225,11 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
-    function getPlaces($displayRejected) {
+    public function getPlaces($stars, $agedate, $compare) {
         $markers = "";
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
-        $query = "SELECT gridref,latitude,longitude,SUM(score) as total FROM places WHERE dateused <= '[todays]' GROUP BY gridref";
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score) as total,MAX(dateused) FROM places WHERE dateused <= '[todays]' GROUP BY gridref";
         $query = str_replace("[todays]", $todays, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -268,24 +239,31 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $result = parent::getResult();
             /* fetch object array */
             while ($row = $result->fetch_row()) {
-                //  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
+//  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
                 $gr = $row[0];
                 $lat = $row[1];
                 $long = $row[2];
                 $no = $row[3];
-                $icon = $this->getStarMarker($no);
-                //  echo "var marker = L.marker([".$lat.", ".$long."]);";
-                // echo " markerList.push(marker);\r\n";
-                if ($icon != "") {
-                    if ($displayRejected) {
-                        If ($no < 0) {
-                            $markers.= "addPlace(markerList ,\"" . $gr . "\", " . $no . ", " . $lat . ", " . $long . ", " . $icon . ");\r\n";
-                        }
-                    } else {
-                        If ($no >= 0) {
-                            $markers.= "addPlace(markerList ,\"" . $gr . "\", " . $no . ", " . $lat . ", " . $long . ", " . $icon . ");\r\n";
-                        }
-                    }
+                $lastused = $row[4];
+
+                $icon = PlacesFunctions::getStarMarker($no);
+                $which = $no;
+                If ($which < 0)
+                    $which = 0;
+                If ($which > 5)
+                    $which = 5;
+                $add = $stars[$which] == 1;
+                $ageadd = false;
+                if ($compare == "older") {
+                    $ageadd = $lastused <= $agedate;
+                }
+                if ($compare == "newer") {
+                    $ageadd = $lastused >= $agedate;
+                }
+
+                if ($add AND $ageadd) {
+                    // echo "<br/>Date " . $lastused;
+                    $markers.= "addPlace(mLst,\"" . $gr . "\"," . $no . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
                 }
             }
             unset($result);
@@ -294,29 +272,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
-    private function getStarMarker($no) {
-
-        $marker = "star0";
-
-        if ($no >= 1) {
-            $marker = "star1";
-        }
-        if ($no >= 2) {
-            $marker = "star2";
-        }
-        if ($no >= 3) {
-            $marker = "star3";
-        }
-        if ($no >= 4) {
-            $marker = "star4";
-        }
-        if ($no >= 5) {
-            $marker = "star5";
-        }
-        return $marker;
-    }
-
-    function getDetails($id) {
+    public function getDetails($id) {
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
         $query = "SELECT name,dateused FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
@@ -329,21 +285,27 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $result = parent::getResult();
             /* fetch object array */
             echo "<p><b>Description</b> [Date used]</p>";
+            $i = 0;
             while ($row = $result->fetch_row()) {
-                //  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
+//  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
                 $desc = $row[0];
                 if ($desc == "") {
-                    $desc = "[No description]";
+                    $desc = "<span class='noDesc'>[No description]</span>";
                 }
                 $lastread = $row[1];
-                echo "  " . $desc . " <div class='small'>[" . $lastread . "]</div><br/>";
+                $i+=1;
+                if ($i > 10) {
+                    echo "<span class='small'>More . . .</span><br/>";
+                    break;
+                }
+                echo "<span class='small'>  " . $desc . " [" . $lastread . "]</span><br/>";
             }
             unset($result);
             parent::freeResult();
         }
     }
 
-    function addErrorLog($text) {
+    public function addErrorLog($text) {
         $names = array();
         $names[] = "date";
         $names[] = "errortext";
@@ -361,9 +323,13 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
-    function connect() {
+    public function connect() {
         parent::connect();
         parent::createTables($this->sql);
+    }
+   
+    public function closeConnection() {
+        parent::closeConnection();
     }
 
 }

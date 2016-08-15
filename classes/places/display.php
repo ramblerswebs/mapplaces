@@ -14,16 +14,25 @@
 class PlacesDisplay {
 
     private $db;
-    private $displayRejected;
+    private $stars;  // array defining which starred walks should be displayed
+    private $age;
 
-    function __construct($database,$displayRejected) {
+    public function __construct($database, $stars, $age) {
         $this->db = $database;
-        $this->displayRejected=$displayRejected;
+        $this->stars = $stars;
+        $this->age = $age;
     }
 
-    function display() {
+    public function display($menu) {
         $template = new Template("dist/mapTemplate.html");
-        $points = $this->db->getPlaces($this->displayRejected);
+        $template->replaceString("// [[Insert menu]]", $menu->getMenu(Null));
+        $compare = "newer";
+        if ($this->age == "10older") {
+            $compare = "older";
+        }
+
+        $agedate = PlacesFunctions::getAgeDate($this->age);
+        $points = $this->db->getPlaces($this->stars, $agedate, $compare);
         $template->replaceString("// [[Add markers here]]", $points);
         $template->insertTemplate();
     }

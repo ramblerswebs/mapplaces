@@ -11,16 +11,23 @@ require_once 'classes/autoload.php';
 
 $config = new Config();
 $db = new PlacesDatabase($config->database);
-$db->Connect();
+$db->connect();
+if (!$db->connected()){
+    PlacesEmail::send("Task: Unable to connect to database", $db->error());
+}
 
-// Logfile::create("logfiles/testing.log");
-
-$nextarea = $db->getNextArea();
-$update = new PlacesUpdate($db, $nextarea);
-$update->processFeed();
-echo "End";
-
-
+$groups = new RamblersOrganisationGroups($db);
+$control = new PlacesControl();
+// now process a number of Ramblers Areas
+$i = 0;
+while ($i <= 4) {
+    $i+=1;
+    $lastAreaProcessed = $control->lastAreaProcessed();
+    $nextArea = $groups->nextArea($lastAreaProcessed);
+    echo "<p>Processing Area: " . $nextArea->getCode()."</p>";
+    $update = new PlacesUpdate($db, $nextArea);
+    $update->processFeed();
+    $control->updateLastAreaProcessed($nextArea);
+}
 
 $db->closeConnection();
-//echo $db->status;

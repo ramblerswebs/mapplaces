@@ -25,9 +25,11 @@
         </style>
     </head>
     <body>
-        <div id="progress"><div id="progress-bar"></div></div>
+        <div id="progress"><div id="progress-bar"></div></div>  
         <div id="map"></div>
-        <script>
+        <span id="agreed">You have agreed that you will check the suitability of locations before you use them.</span>
+         // [[Insert menu]]
+          <script>
             var map = new L.Map('map', {center: new L.LatLng(54.221592, -3.355007), zoom: 5});
             var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
@@ -48,7 +50,7 @@
                 position: 'topright',
                 showMarker: false
             }).addTo(map);
-            mapLayers = {'OSM': osm, 'OSM Terrain': osm2, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2};
+            mapLayers = {'Open Street Map': osm, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2};
             var progress = document.getElementById('progress');
             var progressBar = document.getElementById('progress-bar');
 
@@ -64,44 +66,86 @@
                     progress.style.display = 'none';
                 }
             }
-            var star0 = L.icon({
-                iconUrl: 'images/marker-icon-red.png',
-                iconSize: [13, 20]
+            var s0 = L.icon({
+                iconUrl: 'images/rejected.png',
+                iconSize: [20, 20]
             });
-              var star1 = L.icon({
-                iconUrl: 'images/5blue.png',
-                iconSize: [13, 20]
+            var s1 = L.icon({
+                iconUrl: 'images/1star.png',
+                iconSize: [20, 20]
             });
-            var star2 = L.icon({
-                iconUrl: 'images/5blue.png',
-                iconSize: [17, 25]
+            var s2 = L.icon({
+                iconUrl: 'images/2star.png',
+                iconSize: [24, 24]
             });
-            var star3 = L.icon({
-                iconUrl: 'images/5blue.png',
-                iconSize: [19, 30]
+            var s3 = L.icon({
+                iconUrl: 'images/3star.png',
+                iconSize: [28, 28]
             });
-            var star4 = L.icon({
-                iconUrl: 'images/5blue.png',
-                iconSize: [22, 35]
+            var s4 = L.icon({
+                iconUrl: 'images/4star.png',
+                iconSize: [32, 32]
             });
-            var star5 = L.icon({
-                iconUrl: 'images/5blue.png',
-                iconSize: [25, 41]
+            var s5 = L.icon({
+                iconUrl: 'images/5star.png',
+                iconSize: [36, 36]
             });
 
-            var markersCG = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar});
+            var markersCG = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar, disableClusteringAtZoom: 12});
 
-            var markerList = [];
-  
+            var mLst = [];
+            function makeGroup(color) {
+                return new L.MarkerClusterGroup({
+                    iconCreateFunction: function (cluster) {
+                        return new L.DivIcon({
+                            iconSize: [20, 20],
+                            html: '<div style="text-align:center;color:#fff;background:' +
+                                    color + '">' + cluster.getChildCount() + '</div>'
+                        });
+                    }
+                }).addTo(map);
+            }
+            
             // [[Add markers here]]
 
-            markersCG.addLayers(markerList);
+            markersCG.addLayers(mLst);
             map.addLayer(markersCG);
-        
-            
+
+
             map.addControl(new L.Control.Layers(mapLayers));
 
         </script>
-        <div class="scroll" id="placeinfo"></div>
+        
+        
+        <!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="modalclose">x</span>
+    
+     <div id="placeinfo"><p>Dummy text</p></div>
+  </div>
+
+</div>
+        <script>
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("modalclose")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
     </body>
 </html>

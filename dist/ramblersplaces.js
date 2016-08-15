@@ -5,7 +5,11 @@
  */
 function loadPlaceInfo($url)
 {
+    el = document.getElementById("placeinfo");
+    el.innerHTML= "<p>Fetching descriptions/usage ...</p>";
     ajax($url, "", "placeinfo");
+    modal.style.display = "block";
+    
 }
 
 function reportDescription($gr)

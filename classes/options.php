@@ -6,7 +6,7 @@
  * @author Chris Vaughan
  */
 class Options {
-
+  
     private $gets = array();
     private $posts = array();
     private static $thisclass;
@@ -16,13 +16,9 @@ class Options {
 
         foreach ($_GET as $key => $value) {
             $this->gets[$key] = htmlspecialchars($value);
-          //  echo $value;
-          //  echo $key;
         }
         foreach ($_POST as $key => $value) {
             $this->posts[$key] = htmlspecialchars($value);
-          //  echo $value;
-          //  echo $key;
         }
     }
     public function getOptions(){

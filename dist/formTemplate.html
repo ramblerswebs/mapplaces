@@ -1,11 +1,11 @@
 <form method="GET" action="javascript:processReport()">
-    <p>
+    
         <input type="hidden" id="Report_Type"  value="[typeValue]">
         <input type="hidden" id="Report_GR"  value="[grValue]"> 
-    </p>
-    <p>[title] 
-        <input type="text" id="Report_Text" size="40">
-        <input type="submit" value="Submit" name="B1">
+    
+    [title] 
+        <input type="hidden" id="Report_Text" value="[textValue]">
+        <input type="submit" value="Confirm" name="B1">
         <input type="reset" value="Cancel" name="B2" onclick="javascript:cancelReport()">
-    </p>
+    
 </form>

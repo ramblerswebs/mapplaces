@@ -15,7 +15,22 @@
 /* pantone7474 '#007A87';           */
 
 body {
-      font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    min-width:400px;
+}
+
+.imgRight {
+    float: right;
+    margin:10px;
+}
+.imgLeft {
+    float: left;
+    margin:10px;
+    clear: both;
+}
+
+.noDesc {
+    color: #999999;
 }
 
 .scroll {
@@ -38,25 +53,54 @@ body {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 .small{
-
-    font-size: small;
-    display: inline
+    font-size:  0.85em;
 }
-
+#ageoption{
+    font-weight: bold;
+    padding: 5px;
+}
+#ageoption select{
+    font-weight: bold;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-color: linen;
+}
+#agreed {
+    font-size: small;
+}
+#inputform{
+    max-width:750px;
+    padding:10px;
+    margin-right: 8px;
+    background-color: linen;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
 
 #placereport {
+    border-radius: 5px;
     background-color: #007A87;
     color: #FFFFFF;
+    display: inline-block;    
 }
+
+#placereport form{
+    padding:5px;
+}
+
 #reportphotos ,#reportmap {
     color: #FFFFFF;
     margin: 4px;
 }
 #reportoptions, #reportlinks {
-    float: right;
+
     color: #FFFFFF;
 }
 #reportdesc, #reportgr,#reportphotos,#reportmap {
+    width: auto;
+    font-size: 0.8em;
     margin: 4px;
     background-color: #782327;
     border-radius: 7px;
@@ -77,20 +121,33 @@ body {
 
 }
 
+.placesmenu {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
 
 /* Link buttons in RA colours */
-a.link-button, .link-button a {
+input.link-button, .link-button-small a, .link-button a, link-button-small a{
     color: #fff ;
     font-weight: bold;
+    text-decoration: none;
 }
-.link-button, .link-button a {
+.link-button,input.link-button, .link-button a,.link-button-small, .link-button-small a {
     transition: all 0.3s ease-out 0s;
+}
+
+.link-button-small {
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: .8em;
+    padding: 2px 6px;
+    text-decoration: none;
+    margin-right:10px;
+    color: #FFFFFF;
 }
 .link-button {
     border-radius: 5px;
-}
-.link-button {
-
     cursor: pointer;
     display: inline-block;
     font-size: 1.1em;
@@ -98,30 +155,73 @@ a.link-button, .link-button a {
     text-decoration: none;
 }
 
-.link-button.button-p0110, .link-button.button-p0110:hover {
+.button-grey, .button-grey:hover {
+    background-image: linear-gradient(-90deg, #555555 0%, #888888 100%);
+}
+.button-p0110, .button-p0110:hover {
     background-image: linear-gradient(-90deg, #D7A900 0%, #FBC200 100%);
 }
-.link-button.button-p0159, .link-button.button-p0159:hover {
+.button-p0159, .button-p0159:hover {
     background-image: linear-gradient(-90deg, #C75B12 0%, #E06614 100%);
 }
-.link-button.button-p0186, .link-button.button-p0186:hover {
+.button-p0186, .button-p0186:hover {
     background-image: linear-gradient(-90deg, #C60C30 0%, #F2224B 100%);
 }
-.link-button.button-p0555, .link-button.button-p0555:hover {
+.button-p0555, .button-p0555:hover {
     background-image: linear-gradient(-90deg, #206C49 0%, #2B9163 100%);
 }
-.link-button.button-p0583, .link-button.button-p0583:hover {
+.button-p0583, .button-p0583:hover {
     background-image: linear-gradient(-90deg, #A8B400 0%, #C9D900 100%);
 }
-.link-button.button-p1815, .link-button.button-p1815:hover {
+.button-p1815, .button-p1815:hover {
     background-image: linear-gradient(-90deg, #782327 0%, #9F2F34 100%);
 }
-.link-button.button-p4485, .link-button.button-p4485:hover {
+.button-p4485, .button-p4485:hover {
     background-image: linear-gradient(-90deg, #5B491F 0%, #82682D 100%);
 }
-.link-button.button-p5565, .link-button.button-p5565:hover {
+.button-p5565, .button-p5565:hover {
     background-image: linear-gradient(-90deg, #8BA69C 0%, #A3B8B0 100%);
 }
-.link-button.button-p7474, .link-button.button-p7474:hover {
+.button-p7474, .button-p7474:hover {
     background-image: linear-gradient(-90deg, #007A87 0%, #00A5B7 100%);
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 2000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    border-radius: 20px;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.modalclose {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modalclose:hover,
+.modalclose:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

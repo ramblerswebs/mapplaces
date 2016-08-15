@@ -12,15 +12,28 @@
  * @author Chris Vaughan
  */
 class RamblersFeedWalks {
-    public $json;
+
+    private $json;
+    private $error = 0;
 
     //put your code here
-    function __construct($area) {
-        $feedurl = "http://www.ramblers.org.uk/api/lbs/walks?groups=".$area->code;
+    public function __construct($areacode) {
+        $feedurl = "http://www.ramblers.org.uk/api/lbs/walks?groups=" . $areacode;
         $contents = file_get_contents($feedurl);
         if ($contents != "") {
             $this->json = json_decode($contents);
+            file_put_contents("feed/area_" . $areacode . ".json", $contents);
+        } else {
+            $this->error = 1;
         }
+    }
+
+    public function getJson() {
+        return $this->json;
+    }
+
+    public function errorCode() {
+        return $this->error;
     }
 
 }

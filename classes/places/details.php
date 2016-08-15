@@ -14,49 +14,25 @@ class PlacesDetails {
     }
 
     function display($id, $no) {
-        echo "<div id='reportoptions'>";
-        echo "<div id='reportdesc'><a href=\"javascript:reportDescription('" . $id . "') \">Update Description</a></div>";
-        echo "<div id='reportgr'><a href=\"javascript:reportGridref('" . $id . "') \">Incorrect Grid Ref</a></div>";
-        echo "</div>";
-         echo "<div id='reportlinks'>";
-        echo "<div id='reportphotos'><a href=\"javascript:photos('" . $id . "') \">Photos of area</a></div>";
-       echo "<div id='reportmap'><a href=\"javascript:streetmap('" . $id . "') \">Streetmap</a></div>";
-   //     echo "<div id='reportmap'><a href='http://www.streetmap.co.uk/grid/".$id."&Z=115' target='_blank' >Streetmap</a></div>";
-        echo "</div>";
-        $image = $this->getStarsImage($no);
-        if ($image != null) {
-            echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
-        }
+        $image = PlacesFunctions::getStarsImageUrl($no);
+        echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
+
         echo "<p>";
-        echo "Place Grid Ref: " . $id . " </p>";
+        echo "Place Grid Ref: " . $id;
+        echo "<span id='reportphotos'><a href=\"javascript:photos('" . $id . "') \">Photos of area</a></span>";
+        echo "<span id='reportmap'><a href=\"javascript:streetmap('" . $id . "') \">Streetmap</a></span>";
+        echo "</p>";
         echo "<div id='reportform'>";
 
         echo "</div>";
-        echo "<div id='placereport'></div>";
+
         $this->db->getDetails($id);
-    }
-
-    function getStarsImage($no) {
-
-        switch ($no) {
-
-            case 1:
-                return "images/1_stars.png";
-                break;
-            case 2:
-                return "images/2_stars.png";
-                break;
-            case 3:
-                return "images/3_stars.png";
-                break;
-            case 4:
-                return "images/4_stars.png";
-                break;
-            case 5:
-                return "images/5_stars.png";
-                break;
-        }
-        return null;
+        echo "<hr/>";
+        // echo "<p>Report incorrect place/location<br/>";
+        // echo "<span id='reportdesc'><a href=\"javascript:reportDescription('" . $id . "') \">Provide better Description</a></span>";
+        echo "<span id='reportgr'><a href=\"javascript:reportGridref('" . $id . "') \">Report incorrect location/grid reference</a></span>";
+        echo "</p>";
+        echo "<div id='placereport'></div>";
     }
 
 }

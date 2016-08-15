@@ -12,12 +12,12 @@ class Database {
     private $mysqli;
     private $result;
 
-    function __construct($dbconfig) {
+    public function __construct($dbconfig) {
         $this->config = $dbconfig;
         $this->status = "Disconnected";
     }
 
-    function connect() {
+    public function connect() {
         // echo 'Connecting' . "\n";
         $this->connected = False;
         $host = $this->config->host;
@@ -37,16 +37,20 @@ class Database {
             return;
         } else {
             $this->status = "Connected";
-            $this->connected = true;
+            $this->connected = True;
             return;
         }
     }
 
-    function error() {
+    public function connected() {
+        return $this->connected;
+    }
+
+    public function error() {
         return $this->mysqli->error;
     }
 
-    function createTables($sql) {
+    public function createTables($sql) {
         $res = $this->mysqli->Query("SHOW TABLES");
         if ($res->num_rows == 0) {
             echo "Creating tables<br/>";
@@ -62,7 +66,7 @@ class Database {
         }
     }
 
-    function runQuery($query) {
+    public function runQuery($query) {
         $this->result = $this->mysqli->Query($query);
         if ($this->result) {
             return true;
@@ -72,16 +76,16 @@ class Database {
         }
     }
 
-    function getResult() {
+    public function getResult() {
         return $this->result;
     }
 
-    function freeResult() {
+    public function freeResult() {
         $this->result->close();
         unset($this->result);
     }
 
-    function insertRecord($table, $names, $values) {
+    public function insertRecord($table, $names, $values) {
         $query = "Insert into " . $table;
         $query.=self::createNames($names);
         $query.=self::createValues($values);
@@ -97,7 +101,7 @@ class Database {
         return $res->num_rows > 0;
     }
 
-    function closeConnection() {
+    public function closeConnection() {
         $this->mysqli->close();
         $this->status = "Disconnected";
         $this->connected = False;
@@ -123,9 +127,6 @@ class Database {
         }
         $out = substr($out, 0, -3) . ") ";
         return $out;
-    }
-    function escapeString($text){
-        return $this->mysqli->escape_string($text);
     }
 
 }
