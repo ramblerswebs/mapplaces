@@ -32,7 +32,7 @@ class PlacesReportform {
            $template->replaceString("[title]", "Confirm location/grid reference is not correct  ");
            $template->replaceString("[textValue]", "Incorrect grid ref");
        // }
-        $template->insertTemplate();
+        $template->displayTemplate();
     }
 
     function process($description) {

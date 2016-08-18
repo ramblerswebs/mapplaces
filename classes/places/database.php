@@ -7,7 +7,8 @@
  */
 class PlacesDatabase extends Database {
 
-//put your code here
+    const VALIDPERIOD = 5 * 365; // 5 years
+
     private $tables = ["errorlog", "groups", "places"];
     private $sql = ["CREATE TABLE `groups` (
   `code` text NOT NULL,
@@ -108,7 +109,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         parent::freeResult();
         return $groups;
     }
-  
+
     public function addPlace($type, $walk, $point) {
         $id = $walk->id;
 // delete walk/type if already there
@@ -138,7 +139,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         $names[] = "extras";
         $names[] = "dateused";
         $names[] = "score";
-        $gr=PlacesFunctions::checkGridRef($point->gridRef);
+        $gr = PlacesFunctions::checkGridRef($point->gridRef);
         $values = array();
         $values[] = $id;
         $values[] = $type;
@@ -227,10 +228,8 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
     public function getPlaces($stars, $agedate, $compare) {
         $markers = "";
-        $today = new DateTime("now");
-        $todays = $today->format("Y-m-d");
-        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score) as total,MAX(dateused) FROM places WHERE dateused <= '[todays]' GROUP BY gridref";
-        $query = str_replace("[todays]", $todays, $query);
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places WHERE dateused <= CURDATE() GROUP BY gridref";
+        $query = str_replace("[Period]", self::VALIDPERIOD, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
             $this->addErrorLog(parent::error());
@@ -245,9 +244,8 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $long = $row[2];
                 $no = $row[3];
                 $lastused = $row[4];
-
-                $icon = PlacesFunctions::getStarMarker($no);
-                $which = $no;
+                $which = intval($no+.5);
+                $icon = PlacesFunctions::getStarMarker($which);
                 If ($which < 0)
                     $which = 0;
                 If ($which > 5)
@@ -262,8 +260,8 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 }
 
                 if ($add AND $ageadd) {
-                    // echo "<br/>Date " . $lastused;
-                    $markers.= "addPlace(mLst,\"" . $gr . "\"," . $no . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
+// echo "<br/>Date " . $lastused;
+                    $markers.= "addPlace(mLst,\"" . $gr . "\"," . $which . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
                 }
             }
             unset($result);
@@ -275,7 +273,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
     public function getDetails($id) {
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
-        $query = "SELECT name,dateused FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
+        $query = "SELECT name,dateused,score FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
         $query = str_replace("[todays]", $todays, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -284,24 +282,75 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         if ($ok == true) {
             $result = parent::getResult();
             /* fetch object array */
-            echo "<p><b>Description</b> [Date used]</p>";
+            echo "<p><b>Description</b> [Date used / Score]</p>";
             $i = 0;
             while ($row = $result->fetch_row()) {
 //  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
                 $desc = $row[0];
+                $score = $row[2];
+                $lastread = $row[1];
+                $datetime1 = new DateTime();
+                $datetime2 = new DateTime($lastread);
+// $datetime2 = new DateTime("2006/08/01");
+                $interval = $datetime1->diff($datetime2);
+                $days = $interval->format("%a");
+                $per = max((self::VALIDPERIOD - $days) / self::VALIDPERIOD, 0) * 100;
+                $per = intval($per );
+                $totscore = ceil($score * $per);
                 if ($desc == "") {
                     $desc = "<span class='noDesc'>[No description]</span>";
                 }
-                $lastread = $row[1];
+
                 $i+=1;
                 if ($i > 10) {
                     echo "<span class='small'>More . . .</span><br/>";
                     break;
                 }
-                echo "<span class='small'>  " . $desc . " [" . $lastread . "]</span><br/>";
+                echo "<span class='small'>" . $desc . " [" . $lastread . " / " . $totscore . "%]</span><br/>";
             }
             unset($result);
             parent::freeResult();
+        }
+    }
+
+    public function removeOldLocationRecords() {
+        $query = "DELETE FROM `places` WHERE `dateused`<DATE_SUB(NOW(), INTERVAL 10 YEAR)";
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
+        }
+    }
+
+    public function removeMultipleLocations() {
+        // find number of records for each location
+        $query = "SELECT gridref,COUNT(*) FROM places WHERE dateused <= CURDATE() GROUP BY gridref";
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
+        }
+        if ($ok == true) {
+            $result = parent::getResult();
+            /* fetch object array */
+            while ($row = $result->fetch_row()) {
+
+                $gr = $row[0];
+                $count = $row[1];
+
+                if ($count > 20) {
+                    echo "<p>$gr  $count</p>";
+                    $this->removeLocation($gr, $count - 20);
+                }
+            }
+        }
+    }
+
+    private function removeLocation($gr, $no) {
+        $query = "DELETE FROM `places` WHERE `gridref`='[gridref]' AND dateused <= CURDATE() ORDER BY `dateused` LIMIT [limit] ";
+        $query = str_replace("[gridref]", $gr, $query);
+        $query = str_replace("[limit]", $no, $query);
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
         }
     }
 
@@ -327,7 +376,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         parent::connect();
         parent::createTables($this->sql);
     }
-   
+
     public function closeConnection() {
         parent::closeConnection();
     }

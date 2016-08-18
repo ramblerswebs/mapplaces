@@ -76,17 +76,17 @@ switch ($opts->gets("option")) {
     case "helppage":
         $template = new Template("html/help.html");
         $template->replaceString("// [[Insert menu]]", $menu->getMenu($menuhelp));
-        $template->insertTemplate();
+        $template->displayTemplate();
         break;
     case "gridrefpage":
         $template = new Template("html/gridref.html");
         $template->replaceString("// [[Insert menu]]", $menu->getMenu($menugridref));
-        $template->insertTemplate();
+        $template->displayTemplate();
         break;
     default:
         $template = new Template("html/splash.html");
         $template->replaceString("// [[Insert menu]]", $menu->getMenu($menuoptions));
-        $template->insertTemplate();
+        $template->displayTemplate();
         break;
 }
 $db->closeConnection();

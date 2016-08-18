@@ -27,14 +27,14 @@ class PlacesDisplay {
         $template = new Template("dist/mapTemplate.html");
         $template->replaceString("// [[Insert menu]]", $menu->getMenu(Null));
         $compare = "newer";
-        if ($this->age == "10older") {
+        if ($this->age == "5older") {
             $compare = "older";
         }
 
         $agedate = PlacesFunctions::getAgeDate($this->age);
         $points = $this->db->getPlaces($this->stars, $agedate, $compare);
         $template->replaceString("// [[Add markers here]]", $points);
-        $template->insertTemplate();
+        $template->displayTemplate();
     }
 
 }

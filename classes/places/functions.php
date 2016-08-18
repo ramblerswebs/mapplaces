@@ -106,9 +106,6 @@ class PlacesFunctions {
         $today = new DateTime("now");
         $interval = 'P0Y';
         switch ($age) {
-            case "10years":
-                $interval = 'P10Y';
-                break;
             case "5years":
                 $interval = 'P5Y';
                 break;
@@ -118,8 +115,8 @@ class PlacesFunctions {
             case "1years":
                 $interval = 'P1Y';
                 break;
-            case "10older":
-                $interval = 'P10Y';
+            case "5older":
+                $interval = 'P5Y';
                 break;
         }
         $int = new DateInterval($interval);

@@ -17,7 +17,7 @@ class Template {
         $this->contents = str_replace($string, $with, $this->contents);
     }
 
-    function insertTemplate() {
+    function displayTemplate() {
         echo $this->contents;
     }
 
