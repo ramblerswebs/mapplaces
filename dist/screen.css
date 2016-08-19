@@ -1,7 +1,23 @@
-#map {
-	width: 800px; 
-	height: 600px; 
-	border: 1px solid #ccc;
+#map-container {
+	height: 100%; 
+	
+}
+#map{
+	height:100%; 
+        
+	
+}
+.footer{
+	
+         position: fixed;
+    bottom: 10px;
+    left:100px;
+}
+.topmenu{
+    position: fixed;
+    top: 5px;
+    left:75px;
+   
 }
 
 #progress {

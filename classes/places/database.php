@@ -244,7 +244,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $long = $row[2];
                 $no = $row[3];
                 $lastused = $row[4];
-                $which = intval($no+.5);
+                $which = intval($no + .5);
                 $icon = PlacesFunctions::getStarMarker($which);
                 If ($which < 0)
                     $which = 0;
@@ -282,20 +282,18 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         if ($ok == true) {
             $result = parent::getResult();
             /* fetch object array */
-            echo "<p><b>Description</b> [Date used / Score]</p>";
+            echo "<p><b>Description</b> [Date used / Score]</p><ul>";
             $i = 0;
-            while ($row = $result->fetch_row()) {
-//  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
+            while ($row = $result->fetch_row()) {             
                 $desc = $row[0];
                 $score = $row[2];
                 $lastread = $row[1];
                 $datetime1 = new DateTime();
                 $datetime2 = new DateTime($lastread);
-// $datetime2 = new DateTime("2006/08/01");
                 $interval = $datetime1->diff($datetime2);
                 $days = $interval->format("%a");
                 $per = max((self::VALIDPERIOD - $days) / self::VALIDPERIOD, 0) * 100;
-                $per = intval($per );
+                $per = intval($per);
                 $totscore = ceil($score * $per);
                 if ($desc == "") {
                     $desc = "<span class='noDesc'>[No description]</span>";
@@ -303,11 +301,16 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
                 $i+=1;
                 if ($i > 10) {
-                    echo "<span class='small'>More . . .</span><br/>";
+                   // echo "<li><span class='small'>More . . .</span></li>";
                     break;
                 }
-                echo "<span class='small'>" . $desc . " [" . $lastread . " / " . $totscore . "%]</span><br/>";
+                echo "<li><span class='small'>" . $desc . " [" . $lastread . " / " . $totscore . "%]</span></li>";
             }
+            echo "</ul>";
+            if ($i > 10) {
+                    echo "<span class='small'><b>More . . .</b></span>";
+                   
+                }
             unset($result);
             parent::freeResult();
         }

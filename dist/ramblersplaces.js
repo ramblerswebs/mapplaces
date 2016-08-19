@@ -6,10 +6,10 @@
 function loadPlaceInfo($url)
 {
     el = document.getElementById("placeinfo");
-    el.innerHTML= "<p>Fetching descriptions/usage ...</p>";
+    el.innerHTML = "<p>Fetching descriptions/usage ...</p>";
     ajax($url, "", "placeinfo");
     modal.style.display = "block";
-    
+
 }
 
 function reportDescription($gr)
@@ -62,8 +62,7 @@ function ajax($url, $params, $div)
     if (window.XMLHttpRequest)
     {// code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest();
-    }
-    else
+    } else
     {// code for IE6, IE5
         xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
@@ -85,15 +84,15 @@ function ajax($url, $params, $div)
 
 function addPlace($list, $gr, $no, $lat, $long, $icon)
 {
-    var marker = L.marker([$lat, $long], {icon: $icon, gridref: $gr, no: $no});
-    marker.bindPopup("<b>" + $gr + "</b>");
+    var marker = L.marker([$lat, $long], {icon: $icon, gridref: $gr, no: $no, lat: $lat, long: $long});
+    marker.bindPopup("<b>Grid Ref " + $gr + "</b><br/>Lat/Long " + $lat + " " + $long);
     marker.on('click', onClick);
     $list.push(marker);
 }
 function onClick(e) {
     // console.log(this.options.gridref);
     // console.log(this.options.no);
-    loadPlaceInfo("index.php?option=details&id=" + this.options.gridref + "&no=" + this.options.no);
+    loadPlaceInfo("index.php?option=details&gr=" + this.options.gridref + "&no=" + this.options.no + "&lat=" + this.options.lat + "&long=" + this.options.long);
 }
 
 function photos($gr) {
@@ -103,4 +102,9 @@ function photos($gr) {
 function streetmap($gr) {
     page = "http://www.streetmap.co.uk/grid/" + $gr + "&z=115";
     window2 = open(page, "streetmap", "scrollbars=yes,width=900,height=580,menubar=yes,resizable=yes,status=yes");
+}
+function googlemap($lat, $long) {
+    // https://www.google.com/maps/place/40.7028722+-73.9868281/@40.7028722,-73.9868281,15z
+    page = "https://www.google.com/maps/place/" + $lat + "+" + $long + "/@" + $lat + "," + $long + ",15z";
+    window2 = open(page, "Google Streetview", "scrollbars=yes,width=900,height=580,menubar=yes,resizable=yes,status=yes");
 }

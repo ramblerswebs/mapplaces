@@ -23,7 +23,7 @@ Logfile::create("logfiles/testing.log");
 $config = new Config();
 $db = new PlacesDatabase($config->database);
 $db->Connect();
-if (!$db->connected()){
+if (!$db->connected()) {
     PlacesEmail::send("Index: Unable to connect to database", $db->error());
 }
 $opts = new Options();
@@ -38,7 +38,7 @@ $menu->addItem($menuhelp);
 $menu->addItem($menugridref);
 
 switch ($opts->gets("option")) {
-        case "display":
+    case "display":
         $stars = [];
         $stars[0] = $opts->gets("0star") == "1";
         $stars[1] = $opts->gets("1star") == "1";
@@ -53,9 +53,9 @@ switch ($opts->gets("option")) {
         break;
     case "details":
         $display = new PlacesDetails($db);
-        $display->display($opts->gets("id"), $opts->gets("no"));
+        $display->display($opts->gets("no"), $opts->gets("gr"), $opts->gets("lat"), $opts->gets("long"));
         break;
-     case "report":
+    case "report":
         $gr = $opts->posts("gridref");
         $reporttype = $opts->posts("type");
         $form = new PlacesReportform($db, $gr, $reporttype);
@@ -68,7 +68,7 @@ switch ($opts->gets("option")) {
         $form = new PlacesReportform($db, $gr, $reporttype);
         $form->process($description);
         break;
-   case "importcsv":
+    case "importcsv":
         $file = $opts->gets("file");
         $import = new PlacesImportcsv($db);
         $import->process($file);

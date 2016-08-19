@@ -14,9 +14,12 @@
 /* pantone5565 '#8BA69C';           */
 /* pantone7474 '#007A87';           */
 
-body {
+html, body {
     font-family: Arial, Helvetica, sans-serif;
     min-width:400px;
+    height: 100%;
+    margin:0px;
+   
 }
 
 .imgRight {
@@ -67,7 +70,13 @@ body {
     background-color: linen;
 }
 #agreed {
+    border-radius: 4px;
     font-size: small;
+    font-style: italic;
+    color: #222222;
+    background: rgba(255, 155, 155, 0.75);
+        opacity: 0.6;
+  filter: alpha(opacity=60); /* For IE8 and earlier */
 }
 #inputform{
     max-width:750px;
@@ -90,7 +99,7 @@ body {
     padding:5px;
 }
 
-#reportphotos ,#reportmap {
+.reportbutton-green {
     color: #FFFFFF;
     margin: 4px;
 }
@@ -98,29 +107,30 @@ body {
 
     color: #FFFFFF;
 }
-#reportdesc, #reportgr,#reportphotos,#reportmap {
+.reportbutton-green{
+    background-color: #206C49;
+
+}
+.reportbutton-red{
+    background-color: #782327;
+
+}
+.reportbutton-green, .reportbutton-red {
     width: auto;
     font-size: 0.8em;
     margin: 4px;
-    background-color: #782327;
     border-radius: 7px;
     color: #FFFFFF
 }
-#reportdesc a, #reportgr a, #reportphotos a, #reportmap a{
+.reportbutton-green a, .reportbutton-red a{
     margin:4px;
     color: #FFFFFF;
     text-decoration: none
 }
-#reportdesc a:hover, #reportgr a:hover, #reportphotos a:hover, #reportmap a:hover{
+.reportbutton-green a:hover, .reportbutton-red a:hover{
     color: #DDDDDD;
     text-decoration: none
 }
-
-#reportphotos, #reportmap{
-    background-color: #206C49;
-
-}
-
 .placesmenu {
     margin-top: 5px;
     margin-bottom: 5px;
