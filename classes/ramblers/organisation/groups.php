@@ -23,7 +23,7 @@ class RamblersOrganisationGroups {
 
     private function updateGroupsFromFeed() {
         $lastdate = $this->getGroupsFeedDate();
-        $int = new DateInterval("P1M");
+        $int = new DateInterval("P26D");
         $updatedate = new DateTime("Now");
         $updatedate->sub($int);
         if ($updatedate > $lastdate) {
