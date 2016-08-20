@@ -16,15 +16,8 @@
 
 html, body {
     font-family: Arial, Helvetica, sans-serif;
-    min-width:400px;
-   height: 100%;
-   
+    min-width:400px; 
 }
-.fullbody {
-     
-    margin:0px;
-}
-
 .imgRight {
     float: right;
     margin:10px;

@@ -9,7 +9,7 @@ class PlacesControl {
 
     private $mLastAreaProcessed = "fred";
     private $filename = "notset";
-    const controlfilename="\control\control.json";
+    const controlfilename="control/control.json";
 
     public function __construct() {
         $this->filename = getcwd() . self::controlfilename;

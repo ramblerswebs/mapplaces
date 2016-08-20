@@ -14,22 +14,22 @@
         <!--- Clustering -->
         <link rel="stylesheet" href="dist/MarkerCluster.css" />
         <link rel="stylesheet" href="dist/MarkerCluster.Default.css" />
-        <link rel="stylesheet" href="dist/screen.css" />
+        <link rel="stylesheet" href="dist/mapdisplay.css" />
         <script src="dist/leaflet.markercluster-src.js"></script>
         <!--- Search -->
         <script src="dist/l.control.geosearch.js"></script>
         <script src="dist/l.geosearch.provider.openstreetmap.js"></script>
         <link rel="stylesheet" href="dist/l.geosearch.css" />
     </head>
-    <body class="fullbody">
-        <div id="progress"><div id="progress-bar"></div></div> 
+    <body>
+        <div id="mapprogress"><div id="mapprogress-bar"></div></div> 
         <div id="map-container" style="float:left,height:auto">
             <div id="map"></div>
         </div>
-        <div class="topmenu">
+        <div class="maptopmenu">
             // [[Insert menu]] 
         </div>
-        <div class="footer" >
+        <div class="mapfooter" >
             <span id="agreed">You have agreed that you will check the suitability of locations before you use them.</span>
         </div>
         <script>
@@ -56,8 +56,8 @@
                 showMarker: false
             }).addTo(map);
             mapLayers = {'Open Street Map': osm, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2};
-            var progress = document.getElementById('progress');
-            var progressBar = document.getElementById('progress-bar');
+            var progress = document.getElementById('mapprogress');
+            var progressBar = document.getElementById('mapprogress-bar');
 
             function updateProgressBar(processed, total, elapsed, layersArray) {
                 if (elapsed > 1000) {
