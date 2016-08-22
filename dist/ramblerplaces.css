@@ -148,7 +148,7 @@ input.link-button, .link-button-small a, .link-button a, link-button-small a{
     border-radius: 4px;
     border:1px outset;
     border-color:gray;
-    padding:0px;
+    padding:3px;
     padding-right:5px;
     padding-left:5px;
 
