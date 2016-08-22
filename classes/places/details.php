@@ -16,9 +16,8 @@ class PlacesDetails {
     function display($no, $gr, $lat, $long) {
         $image = PlacesFunctions::getStarsImageUrl($no);
         echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
-
         echo "<p>";
-        echo "Place Grid Ref: " . $gr;
+        echo "<span class='location'>Place Grid Ref: " . $gr . "</span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:photos('" . $gr . "') \">Photos of area</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:streetmap('" . $gr . "') \">Streetmap</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:googlemap(" . $lat . "," . $long . ") \">Google Map</a></span>";
