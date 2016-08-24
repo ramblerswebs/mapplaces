@@ -28,6 +28,11 @@ class RamblersFeedWalks {
         }
     }
 
+    public static function getDateFileLastUpdated($areacode) {
+        $file = "feed/area_" . $areacode . ".json";
+        return PlacesFunctions::getDateFileLastUpdated($file);
+    }
+
     public function getJson() {
         return $this->json;
     }

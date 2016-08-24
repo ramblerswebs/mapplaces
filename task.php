@@ -24,9 +24,15 @@ while ($i <= 4) {
     $i+=1;
     $lastAreaProcessed = $control->lastAreaProcessed();
     $nextArea = $groups->nextArea($lastAreaProcessed);
-    echo "<p>Processing Area: " . $nextArea->getCode() . "</p>";
-    $update = new PlacesUpdate($db, $nextArea);
-    $update->processFeed();
+    $lastupdated = RamblersFeedWalks::getDateFileLastUpdated($nextArea->getCode());
+    $yesterday = new DateTime("yesterday");
+    if ($lastupdated < $yesterday) {
+        echo "<p>Processing Area: " . $nextArea->getCode() . "</p>";
+        $update = new PlacesUpdate($db, $nextArea);
+        $update->processFeed();
+    } else {
+         echo "<p>Area: " . $nextArea->getCode() . " already processed today</p>";
+    }       
     $control->updateLastAreaProcessed($nextArea);
 }
 // remove items over 10 years old
