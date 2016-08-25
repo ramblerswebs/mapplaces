@@ -26,6 +26,7 @@ class PlacesDisplay {
     public function display($menu) {
         $template = new Template("dist/mapTemplate.html");
         $template->replaceString("// [[Insert menu]]", $menu->getMenu(Null));
+        $template->replaceStringWithFile("// [[Insert Analytics]]", "analyticstracking.php");
         $compare = "newer";
         if ($this->age == "5older") {
             $compare = "older";

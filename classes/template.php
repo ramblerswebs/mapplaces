@@ -9,15 +9,20 @@ class Template {
 
     private $contents;
 
-    function __construct($template) {
+    public function __construct($template) {
         $this->contents = file_get_contents($template);
     }
 
-    function replaceString($string, $with) {
+    public function replaceString($string, $with) {
         $this->contents = str_replace($string, $with, $this->contents);
     }
 
-    function displayTemplate() {
+    public function replaceStringWithFile($string, $file) {
+        $with = file_get_contents($file);
+        $this->contents = str_replace($string, $with, $this->contents);
+    }
+
+    public function displayTemplate() {
         echo $this->contents;
     }
 
