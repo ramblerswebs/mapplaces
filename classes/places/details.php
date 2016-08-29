@@ -17,7 +17,13 @@ class PlacesDetails {
         $image = PlacesFunctions::getStarsImageUrl($no);
         echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
         echo "<p>";
-        echo "<span class='location'>Place Grid Ref: " . $gr . "</span>";
+        if (strlen($gr) == 8) {
+            $grdisp = substr($gr, 0, 2) . " " . substr($gr, 2, 3) . " " . substr($gr,5, 3);
+        } else {
+            $grdisp = $gr;
+        }
+
+        echo "<span class='location'>Place Grid Ref: <b>" . $grdisp . "</b></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:photos('" . $gr . "') \">Photos of area</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:streetmap('" . $gr . "') \">Streetmap</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:googlemap(" . $lat . "," . $long . ") \">Google Map</a></span>";

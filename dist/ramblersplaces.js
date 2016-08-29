@@ -3,6 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
 function loadPlaceInfo($url)
 {
     el = document.getElementById("placeinfo");
@@ -85,7 +87,12 @@ function ajax($url, $params, $div)
 function addPlace($list, $gr, $no, $lat, $long, $icon)
 {
     var marker = L.marker([$lat, $long], {icon: $icon, gridref: $gr, no: $no, lat: $lat, long: $long});
-    marker.bindPopup("<b>Grid Ref " + $gr + "</b><br/>Lat/Long " + $lat + " " + $long);
+    if ($gr.length == 8) {
+        $grdisp = $gr.substr(0, 2) + " " + $gr.substr(2, 3) + " " + $gr.substr(5, 3);
+    } else {
+        $grdisp = $gr;
+    }
+    marker.bindPopup("<b>Grid Ref " + $grdisp + "</b><br/>Lat/Long " + $lat + " " + $long);
     marker.on('click', onClick);
     $list.push(marker);
 }
@@ -108,3 +115,6 @@ function googlemap($lat, $long) {
     page = "https://www.google.com/maps/place/" + $lat + "+" + $long + "/@" + $lat + "," + $long + ",15z";
     window2 = open(page, "Google Streetview", "scrollbars=yes,width=900,height=580,menubar=yes,resizable=yes,status=yes");
 }
+
+
+
