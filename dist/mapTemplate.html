@@ -45,10 +45,11 @@
 
             var map = new L.Map('map', {center: new L.LatLng(54.221592, -3.355007),
                 zoom: 5,
+                minZoom: 4,
                 trackResize: true});
             var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> '});
+               attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> '});
             var osm2 = new L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -61,8 +62,9 @@
             var ggl3 = new L.Google('SATELLITE');
             map.addLayer(osm);
             new L.Control.GeoSearch({
-                provider: new L.GeoSearch.Provider.OpenStreetMap(),
+                provider: new L.GeoSearch.Provider.OpenStreetMap({countrycodes:'gb'}),
                 position: 'topright',
+                zoomLevel: 14,
                 showMarker: false
             }).addTo(map);
             mapLayers = {'Open Street Map': osm, 'Google': ggl, 'Google Satellite': ggl3, 'Google Hybrid': ggl2};
@@ -83,27 +85,27 @@
             }
             var s0 = L.icon({
                 iconUrl: 'images/rejected.png',
-                iconSize: [20, 20]
+                iconSize: [15, 15]
             });
             var s1 = L.icon({
                 iconUrl: 'images/1star.png',
-                iconSize: [20, 20]
+                iconSize: [19, 19]
             });
             var s2 = L.icon({
                 iconUrl: 'images/2star.png',
-                iconSize: [24, 24]
+                iconSize: [21, 21]
             });
             var s3 = L.icon({
                 iconUrl: 'images/3star.png',
-                iconSize: [28, 28]
+                iconSize: [23, 23]
             });
             var s4 = L.icon({
                 iconUrl: 'images/4star.png',
-                iconSize: [32, 32]
+                iconSize: [25, 25]
             });
             var s5 = L.icon({
                 iconUrl: 'images/5star.png',
-                iconSize: [36, 36]
+                iconSize: [27, 27]
             });
 
             var markersCG = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar, disableClusteringAtZoom: 12});

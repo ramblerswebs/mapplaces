@@ -56,7 +56,7 @@ function createParams($array)
 function cancelReport()
 {
     $div = "placereport";
-    document.getElementById($div).innerHTML = "Cancelled";
+    document.getElementById($div).innerHTML = "<div class='reportbutton-red'>Cancelled</div>";
 }
 function ajax($url, $params, $div)
 {

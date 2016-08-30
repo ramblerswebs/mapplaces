@@ -35,11 +35,12 @@ class PlacesDetails {
 
         $this->db->getDetails($gr);
         echo "<hr/>";
+        echo "<div id='placereport'>";
         // echo "<p>Report incorrect place/location<br/>";
         // echo "<span id='reportdesc'><a href=\"javascript:reportDescription('" . $id . "') \">Provide better Description</a></span>";
         echo "<span class='reportbutton-red'><a href=\"javascript:reportGridref('" . $gr . "') \">Report incorrect location/grid reference</a></span>";
         echo "</p>";
-        echo "<div id='placereport'></div>";
+        echo "</div>";
     }
 
 }

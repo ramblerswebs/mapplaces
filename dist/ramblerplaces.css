@@ -85,7 +85,7 @@ html, body {
     border-radius: 15px;
 }
 
-#placereport {
+#placereport form{
     border-radius: 5px;
     background-color: #007A87;
     color: #FFFFFF;

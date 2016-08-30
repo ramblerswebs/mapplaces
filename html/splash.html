@@ -16,15 +16,14 @@
             have used for walks in the past. Many of these will be car parks suitable for either starting a walk or for car sharing.
             PLEASE note that while Ramblers Groups have used these locations it DOES NOT mean that 
             they are suitable for your use. </p>
-        <p>By clicking on the <a href="index.php?option=display&2star=1&3star=1&4star=1&5star=1&age=5years" >Continue</a> button below 
+        <p>By clicking on the <a href="index.php?option=display&1star=1&2star=1&3star=1&4star=1&5star=1&age=5years" >Continue</a> button below 
             you are agreeing that you will check the suitability of locations before 
             you use them.</p>
         <form id="inputform" action="index.php" method="get">
             <p><b>You can select which locations are displayed based on when and how often they have been used.</b></p>
-
-            <input type="hidden" name="option" value="display">
+            <div><input type="hidden" name="option" value="display" ></div>        
             <div><img width="100" height="20" src="images/0_stars.png" alt="Rejected"> <input type="checkbox" name="0star" value="1" > Rejected locations - view places that have been flagged as no longer suitable</div>
-            <div><img width="100" height="20" src="images/1_stars.png" alt="1stars"> <input type="checkbox" name="1star" value="1" >Locations used only once</div>
+            <div><img width="100" height="20" src="images/1_stars.png" alt="1stars"> <input type="checkbox" name="1star" value="1" checked>Locations used only once</div>
             <div><img width="100" height="20" src="images/2_stars.png" alt="2stars"> <input type="checkbox" name="2star" value="1" checked>Used twice</div>
             <div><img width="100" height="20" src="images/3_stars.png" alt="3stars"> <input type="checkbox" name="3star" value="1" checked>Used three times</div>
             <div><img width="100" height="20" src="images/4_stars.png" alt="4stars"> <input type="checkbox" name="4star" value="1" checked>Used four times</div>

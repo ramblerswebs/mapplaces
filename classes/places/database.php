@@ -250,7 +250,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                     $which = 0;
                 If ($which > 5)
                     $which = 5;
-                $add = $stars[$which] == 1;
+                $add = $stars[$which];
                 $ageadd = false;
                 if ($compare == "older") {
                     $ageadd = $lastused <= $agedate;
