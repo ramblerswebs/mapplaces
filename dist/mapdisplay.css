@@ -40,3 +40,6 @@ html, body {
     background-color: #76A6FC;
     border-radius: 4px;
 }
+.osgridref {
+    font-weight: 700;font-size:125%;
+}

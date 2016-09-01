@@ -232,13 +232,13 @@ Vector3d.prototype.rotateAround = function(axis, theta) {
  * @param   {number} [precision=3] - Number of decimal places to be used.
  * @returns {string} Vector represented as [x,y,z].
  */
-Vector3d.prototype.toString = function(precision) {
-    var p = (precision === undefined) ? 3 : Number(precision);
+//Vector3d.prototype.toString = function(precision) {
+//    var p = (precision === undefined) ? 3 : Number(precision);
 
-    var str = '[' + this.x.toFixed(p) + ',' + this.y.toFixed(p) + ',' + this.z.toFixed(p) + ']';
+//   var str = '[' + this.x.toFixed(p) + ',' + this.y.toFixed(p) + ',' + this.z.toFixed(p) + ']';
 
-    return str;
-};
+//    return str;
+//};
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

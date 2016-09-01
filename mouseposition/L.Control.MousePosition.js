@@ -20,27 +20,8 @@ L.Control.MousePosition = L.Control.extend({
         map.off('mousemove', this._onMouseMove)
     },
     _onMouseMove: function (e) {
-        // var LatLon = require('geodesy').LatLonSpherical;
-        // get Lat/Long and Grid Reference
-        var p = new LatLon(e.latlng.lat, e.latlng.lng);
-        var grid = OsGridRef.latLonToOsGrid(p);
-        var gr = grid.toString(6);
-        var zoom = map.getZoom();
-        if (zoom > 12) {
-            var rect = OsGridRef.osGridToLatLongSquare(grid);
-            var bounds = [[rect[0].lat, rect[0].lng],
-                [rect[1].lat, rect[0].lng],
-                [rect[1].lat, rect[1].lng],
-                [rect[0].lat, rect[1].lng],
-                [rect[0].lat, rect[0].lng]];
-            // change rectangle
-            gridsquare.setLatLngs(bounds);
-        }
-        var lng = this.options.lngFormatter ? this.options.lngFormatter(e.latlng.lng) : L.Util.formatNum(e.latlng.lng, this.options.numDigits);
-        var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
-        var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
-        var prefixAndValue = 'OS Grid Ref: <span class="osgridref">' + gr +"</span><br/>"+ this.options.prefix + ' ' + value;
-        this._container.innerHTML = prefixAndValue;
+        var text = getMouseMoveAction(e, map);
+        this._container.innerHTML = text;
     }
 
 });
