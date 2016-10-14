@@ -66,15 +66,7 @@ html, body {
     background-color: linen;
     font-size:  .9em;
 }
-#agreed {
-    border-radius: 4px;
-    font-size: small;
-    font-style: italic;
-    color: #ffffff;
-    background: #C60C30;
-    opacity: 0.6;
-    filter: alpha(opacity=60); /* For IE8 and earlier */
-}
+
 #inputform{
     max-width:750px;
     padding:10px;

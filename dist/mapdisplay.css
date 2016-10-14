@@ -7,11 +7,6 @@ html, body {
     height: 100%; 
 }
 
-.mapfooter{
-    position: fixed;
-    bottom: 10px;
-    left:100px;
-}
 .maptopmenu{
     position: fixed;
     top: 5px;
@@ -42,4 +37,17 @@ html, body {
 }
 .osgridref {
     font-weight: 700;font-size:125%;
+}
+
+#postcodes {
+    position: relative;
+    left: 100px;
+    border-radius: 4px;
+    font-size: 75%;
+    font-style: italic;
+    font-weight: bold;
+    color: #222222;
+    background: #ffffff;
+    opacity: 0.6;
+    filter: alpha(opacity=60); /* For IE8 and earlier */
 }

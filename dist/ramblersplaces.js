@@ -3,27 +3,108 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+function displayPostcodes(e, map) {
+    var p = new LatLon(e.latlng.lat, e.latlng.lng);
+    var grid = OsGridRef.latLonToOsGrid(p);
+    gr = grid.toString(6);
+    if (gr != "") {
+// remove previous postcodes
+        postcodelayer.clearLayers();
+        var msg = "Searching ...";
+        var marker = L.circleMarker(p).bindPopup(msg);
+        postcodelayer.addLayer(marker);
+        marker.openPopup();
+        var east = Math.round(grid.easting);
+        var north = Math.round(grid.northing);
+        // get postcodes around this point
+        url = "http://postcodes.theramblers.org.uk/index.php?easting=" + east + "&northing=" + north + "&dist=10&maxpoints=20";
+        getJSON(url, function (err, data) {
+            postcodelayer.clearLayers();
+            if (err != null) {
+                var msg = "Error: Something went wrong: " + err;
+                var marker = L.circleMarker(p).bindPopup(msg);
+                postcodelayer.addLayer(marker);
+                marker.openPopup();
+            } else {
+                if (data.length == 0) {
+                    var msg = "No postcodes found within 10Km";
+                    var marker = L.circleMarker(p).bindPopup(msg);
+                    postcodelayer.addLayer(marker);
+                    marker.openPopup();
+
+                } else {
+                    for (i in data) {
+                        if (i == 0) {
+                            style = {color: 'green', weight: 5, opacity: 0.2};
+                        } else {
+                            style = {color: 'blue', weight: 4, opacity: 0.2};
+                        }
+                        item = data[i];
+                        var popup = item.Postcode + "<br />Distance: " + kFormatter(Math.round(item.Distance)) + "m";
+                        var easting = item.Easting;
+                        var northing = item.Northing;
+                        var gr = new OsGridRef(easting, northing);
+                        var latlong = OsGridRef.osGridToLatLon(gr);
+                        pt = new L.latLng(latlong.lat, latlong.lon);
+                        // display postcodes
+                        //   postcodelayer.addLayer(L.marker(pt, {icon: postcodeIcon}).bindPopup(popup));
+                        var marker = L.marker(pt, {icon: postcodeIcon}).bindPopup(popup)
+                        postcodelayer.addLayer(marker);
+                        if (i == 0) {
+                            marker.openPopup();
+                        }
+                        postcodelayer.addLayer(L.polyline([pt, p], style));
+                    }
+                }
+            }
+        });
+    }
+
+}
+
+function kFormatter(num) {
+    return num > 999 ? (num / 1000).toFixed(1) + 'K' : num
+}
+
+
+var getJSON = function (url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", url, true);
+    xhr.responseType = "json";
+    xhr.onload = function () {
+        var status = xhr.status;
+        if (status == 200) {
+            callback(null, xhr.response);
+        } else {
+            callback(status);
+        }
+    };
+    xhr.send();
+};
+// Helper method to parse the title tag from the response.
+function getTitle(text) {
+    return text.match('<title>(.*)?</title>')[1];
+}
+
 function getMouseMoveAction(e, map) {
     var zoom = map.getZoom();
     var p = new LatLon(e.latlng.lat, e.latlng.lng);
     var grid = OsGridRef.latLonToOsGrid(p);
-
     if (zoom > 16) {
         gr = grid.toString(8);
-        gridref = '8 figure grid reference<br/><span class="osgridref">' + gr + "</span><br/>";
+        gridref = '8 figure grid reference [10m<sup>2</sup>]<br/><span class="osgridref">' + gr + "</span><br/>";
     } else {
         gr = grid.toString(6);
-        gridref = '6 figure grid reference<br/><span class="osgridref">' + gr + "</span><br/>";
+        gridref = '6 figure grid reference [100m<sup>2</sup>]<br/><span class="osgridref">' + gr + "</span><br/>";
     }
-    if (gr==""){
-        gridref="Outside OS Grid<br/>";
+    if (gr == "") {
+        gridref = "Outside OS Grid<br/>";
     }
 
     if (zoom > 12) {
         var bounds = osGridToLatLongSquare(grid, 100);
         // change rectangle
         gridsquare100.setLatLngs(bounds);
-
     }
     if (zoom > 16) {
         var bounds2 = osGridToLatLongSquare(grid, 10);
@@ -39,8 +120,8 @@ function getMouseMoveAction(e, map) {
 }
 
 function osGridToLatLongSquare(gridref, size) {
-    //  if (!(gridref instanceof OsGridRef))
-    //      throw new TypeError('gridref is not OsGridRef object');
+//  if (!(gridref instanceof OsGridRef))
+//      throw new TypeError('gridref is not OsGridRef object');
 
     var E1 = Math.floor(gridref.easting / size) * size;
     var N1 = Math.floor(gridref.northing / size) * size;
@@ -54,7 +135,6 @@ function osGridToLatLongSquare(gridref, size) {
     var ll2 = OsGridRef.osGridToLatLon(g2);
     var ll3 = OsGridRef.osGridToLatLon(g3);
     var ll4 = OsGridRef.osGridToLatLon(g4);
-
     var bounds = [[ll1.lat, ll1.lon],
         [ll2.lat, ll2.lon],
         [ll3.lat, ll3.lon],
@@ -63,7 +143,7 @@ function osGridToLatLongSquare(gridref, size) {
     return bounds;
 }
 function osMapGrid(L, layer) {
-    style = {color: '#333366', weight: 1,opacity: 0.2};
+    style = {color: '#333366', weight: 1, opacity: 0.2};
     for (east = 0; east < 700500; east += 100000) {
         lines = new Array();
         i = 0;
@@ -73,8 +153,8 @@ function osMapGrid(L, layer) {
             lines[i] = new L.latLng(latlong.lat, latlong.lon);
             i++;
         }
-       // L.polyline(lines, style).addTo(map);
-       layer.addLayer(L.polyline(lines, style));
+// L.polyline(lines, style).addTo(map);
+        layer.addLayer(L.polyline(lines, style));
     }
     for (north = 0; north < 1300500; north += 100000) {
         lines = new Array();
@@ -85,8 +165,8 @@ function osMapGrid(L, layer) {
             lines[i] = new L.latLng(latlong.lat, latlong.lon);
             i++;
         }
-       // L.polyline(lines, style).addTo(map);
-       layer.addLayer(L.polyline(lines, style));
+// L.polyline(lines, style).addTo(map);
+        layer.addLayer(L.polyline(lines, style));
     }
 }
 
@@ -96,7 +176,6 @@ function loadPlaceInfo($url)
     el.innerHTML = "<p>Fetching descriptions/usage ...</p>";
     ajax($url, "", "placeinfo");
     modal.style.display = "block";
-
 }
 
 function reportDescription($gr)
@@ -182,8 +261,8 @@ function addPlace($list, $gr, $no, $lat, $long, $icon)
     $list.push(marker);
 }
 function onClick(e) {
-    // console.log(this.options.gridref);
-    // console.log(this.options.no);
+// console.log(this.options.gridref);
+// console.log(this.options.no);
     loadPlaceInfo("index.php?option=details&gr=" + this.options.gridref + "&no=" + this.options.no + "&lat=" + this.options.lat + "&long=" + this.options.long);
 }
 
@@ -196,7 +275,7 @@ function streetmap($gr) {
     window2 = open(page, "streetmap", "scrollbars=yes,width=900,height=580,menubar=yes,resizable=yes,status=yes");
 }
 function googlemap($lat, $long) {
-    // https://www.google.com/maps/place/40.7028722+-73.9868281/@40.7028722,-73.9868281,15z
+// https://www.google.com/maps/place/40.7028722+-73.9868281/@40.7028722,-73.9868281,15z
     page = "https://www.google.com/maps/place/" + $lat + "+" + $long + "/@" + $lat + "," + $long + ",15z";
     window2 = open(page, "Google Streetview", "scrollbars=yes,width=900,height=580,menubar=yes,resizable=yes,status=yes");
 }

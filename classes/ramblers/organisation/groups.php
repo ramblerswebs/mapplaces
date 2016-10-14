@@ -84,11 +84,7 @@ class RamblersOrganisationGroups {
         }
     }
 
-    //  public function Groups() {
-    //      return $this->mgroups;
-    //  }
-
-    public function nextArea($lastAreaProcessed) {
+     public function nextArea($lastAreaProcessed) {
         $first = null;
         foreach ($this->mgroups as $group) {
             If ($group->getScope() == "A") {
