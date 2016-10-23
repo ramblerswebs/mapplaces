@@ -301,16 +301,11 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
                 $i+=1;
                 if ($i > 10) {
-                   // echo "<li><span class='small'>More . . .</span></li>";
-                    break;
+                   break;
                 }
                 echo "<li><span class='small'>" . $desc . " [" . $lastread . " / " . $totscore . "%]</span></li>";
             }
             echo "</ul>";
-            if ($i > 10) {
-                    echo "<span class='small'><b>More . . .</b></span>";
-                   
-                }
             unset($result);
             parent::freeResult();
         }

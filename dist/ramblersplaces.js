@@ -7,57 +7,65 @@ function displayPostcodes(e, map) {
     var p = new LatLon(e.latlng.lat, e.latlng.lng);
     var grid = OsGridRef.latLonToOsGrid(p);
     gr = grid.toString(6);
+    gr10 = grid.toString(8);
+    var desc = "<b>Latitude: </b>" + e.latlng.lat.toFixed(5) + "<br/><b>Longitude: </b>" + e.latlng.lng.toFixed(5);
+    results = encodeShortest(e.latlng.lat, e.latlng.lng);
+    if (results.length > 0) {
+        desc += '<br/><b><a href="http://www.mapcode.com" target="_blank">Mapcode:</a> </b>' + results[0].fullmapcode;
+    }
+    postcodelayer.clearLayers();
+    var msg = "   ";
+    var point = L.marker(p).bindPopup(msg);
+    postcodelayer.addLayer(point);
     if (gr != "") {
+        desc += "<br/><b>Grid Reference: </b>" + gr +
+                "<br/><b>Grid Reference: </b>" + gr10 + " (8 Figure)";
 // remove previous postcodes
-        postcodelayer.clearLayers();
-        var msg = "Searching ...";
-        var marker = L.circleMarker(p).bindPopup(msg);
-        postcodelayer.addLayer(marker);
-        marker.openPopup();
+
+        point.getPopup().setContent("Searching ...");
+        point.openPopup();
+        // get postcodes around this point       
         var east = Math.round(grid.easting);
         var north = Math.round(grid.northing);
-        // get postcodes around this point
+
         url = "http://postcodes.theramblers.org.uk/index.php?easting=" + east + "&northing=" + north + "&dist=10&maxpoints=20";
-        getJSON(url, function (err, data) {
-            postcodelayer.clearLayers();
+        getJSON(url, function (err, items) {
             if (err != null) {
                 var msg = "Error: Something went wrong: " + err;
-                var marker = L.circleMarker(p).bindPopup(msg);
-                postcodelayer.addLayer(marker);
-                marker.openPopup();
+                point.getPopup().setContent(msg);
             } else {
-                if (data.length == 0) {
-                    var msg = "No postcodes found within 10Km";
-                    var marker = L.circleMarker(p).bindPopup(msg);
-                    postcodelayer.addLayer(marker);
-                    marker.openPopup();
-
+                if (items.length == 0) {
+                    closest = "No postcodes found within 10Km";
+                    point.getPopup().setContent(closest);
                 } else {
-                    for (i in data) {
-                        if (i == 0) {
-                            style = {color: 'green', weight: 5, opacity: 0.2};
-                        } else {
-                            style = {color: 'blue', weight: 4, opacity: 0.2};
-                        }
-                        item = data[i];
-                        var popup = item.Postcode + "<br />Distance: " + kFormatter(Math.round(item.Distance)) + "m";
+                    for (i in items) {
+
+                        var item = items[i];
+                        var popup = item.Postcode + "<br />     Distance: " + kFormatter(Math.round(item.Distance)) + "m";
                         var easting = item.Easting;
                         var northing = item.Northing;
                         var gr = new OsGridRef(easting, northing);
                         var latlong = OsGridRef.osGridToLatLon(gr);
                         pt = new L.latLng(latlong.lat, latlong.lon);
-                        // display postcodes
-                        //   postcodelayer.addLayer(L.marker(pt, {icon: postcodeIcon}).bindPopup(popup));
-                        var marker = L.marker(pt, {icon: postcodeIcon}).bindPopup(popup)
-                        postcodelayer.addLayer(marker);
                         if (i == 0) {
-                            marker.openPopup();
+                            var marker = L.marker(pt, {icon: postcodeIconClosest}).bindPopup(popup);
+                            style = {color: 'green', weight: 4, opacity: 0.2};
+                        } else {
+                            var marker = L.marker(pt, {icon: postcodeIcon}).bindPopup(popup);
+                            style = {color: 'blue', weight: 4, opacity: 0.2};
                         }
+                        postcodelayer.addLayer(marker);
                         postcodelayer.addLayer(L.polyline([pt, p], style));
                     }
                 }
+                point.getPopup().setContent(desc);
+                point.openPopup();
             }
         });
+    } else {
+        desc += "<br/>Outside OS Grid";
+        point.getPopup().setContent(desc);
+        point.openPopup();
     }
 
 }
@@ -74,13 +82,19 @@ var getJSON = function (url, callback) {
     xhr.onload = function () {
         var status = xhr.status;
         if (status == 200) {
-            callback(null, xhr.response);
+            if (typeof xhr.response === 'string') {
+                items = JSON.parse(xhr.response);
+            } else {
+                items = xhr.response;
+            }
+            callback(null, items);
         } else {
             callback(status);
         }
     };
     xhr.send();
 };
+
 // Helper method to parse the title tag from the response.
 function getTitle(text) {
     return text.match('<title>(.*)?</title>')[1];
@@ -99,19 +113,19 @@ function getMouseMoveAction(e, map) {
     }
     if (gr == "") {
         gridref = "Outside OS Grid<br/>";
-    }
-
-    if (zoom > 12) {
-        var bounds = osGridToLatLongSquare(grid, 100);
-        // change rectangle
-        gridsquare100.setLatLngs(bounds);
-    }
-    if (zoom > 16) {
-        var bounds2 = osGridToLatLongSquare(grid, 10);
-        // change rectangle
-        gridsquare10.setLatLngs(bounds2);
     } else {
-        gridsquare10.setLatLngs([[84, -89], [84.00001, -89.000001]]);
+        if (zoom > 12) {
+            var bounds = osGridToLatLongSquare(grid, 100);
+            // change rectangle
+            gridsquare100.setLatLngs(bounds);
+        }
+        if (zoom > 16) {
+            var bounds2 = osGridToLatLongSquare(grid, 10);
+            // change rectangle
+            gridsquare10.setLatLngs(bounds2);
+        } else {
+            gridsquare10.setLatLngs([[84, -89], [84.00001, -89.000001]]);
+        }
     }
     var lng = e.latlng.lng.toFixed(5);
     var lat = e.latlng.lat.toFixed(5);
