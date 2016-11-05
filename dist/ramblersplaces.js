@@ -38,7 +38,7 @@ function displayPostcodes(e, map) {
                     closest = "No postcodes found within 10Km";
                     point.getPopup().setContent(closest);
                 } else {
-                    for (i in items) {
+                     for (i = 0; i < items.length; i++) { 
 
                         var item = items[i];
                         var popup = item.Postcode + "<br />     Distance: " + kFormatter(Math.round(item.Distance)) + "m";
