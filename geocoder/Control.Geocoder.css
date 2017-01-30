@@ -33,11 +33,12 @@
 .leaflet-control-geocoder-expanded .leaflet-control-geocoder-form {
 	display: inline-block;
 }
-.leaflet-control-geocoder-form input {
+div.leaflet-control-geocoder-form input {
 	font-size: 120%;
 	border: 0;
 	background-color: transparent;
 	width: 246px;
+        margin-bottom: 0px; 
 }
 
 .leaflet-control-geocoder-icon {
@@ -64,7 +65,7 @@
 	display: none;
 }
 
-.leaflet-control-geocoder-form input:focus {
+div.leaflet-control-geocoder-form input:focus {
 	outline: none;
 }
 

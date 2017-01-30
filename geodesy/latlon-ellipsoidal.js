@@ -247,9 +247,9 @@ Vector3d.prototype.applyTransform = function(t)   {
  * @param   {number} [dp=0|2|4] - Number of decimal places to use - default 0 for dms, 2 for dm, 4 for d.
  * @returns {string} Comma-separated latitude/longitude.
  */
-//LatLon.prototype.toString = function(format, dp) {
- //   return Dms.toLat(this.lat, format, dp) + ', ' + Dms.toLon(this.lon, format, dp);
- //   };
+LatLon.prototype.toString = function(format, dp) {
+    return Dms.toLat(this.lat, format, dp) + ', ' + Dms.toLon(this.lon, format, dp);
+};
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

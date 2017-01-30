@@ -1,4 +1,4 @@
-var L, map, OsGridRef;
+var L, ramblersMap;
 L.Control.Mouse = L.Control.extend({
     options: {
         position: 'bottomleft',
@@ -10,17 +10,17 @@ L.Control.Mouse = L.Control.extend({
     onAdd: function (map) {
         this._container = L.DomUtil.create('div', 'leaflet-control-mouseposition');
         L.DomEvent.disableClickPropagation(this._container);
-        map.on('mousemove', this._onMouseMove, this);
+        map.on('mousemove', this._update, this);
         this._container.innerHTML = this.options.emptyString;
         return this._container;
     },
     onRemove: function (map) {
-        map.off('mousemove', this._onMouseMove);
+        map.off('mousemove', this._update);
     },
-    _onMouseMove: function (e) {
-        var text = getMouseMoveAction(e, map);
+    _update: function (e) {
+        var text = getMouseMoveAction(e);
         this._container.innerHTML = text;
-    },
+    }
 });
 
 L.Map.mergeOptions({
@@ -41,38 +41,35 @@ L.control.mouse = function (options) {
 L.Control.PostcodeStatus = L.Control.extend({
     options: {
         position: 'bottomleft',
-        defaultString: 'Zoom in and right click to see nearby postcodes'
+        zoominString: 'Zoom in and right click/tap hold to see nearby postcodes',
+        displayString: 'Right click/tap hold to see nearby postcodes',
     },
+    displaymap: null,
     onAdd: function (map) {
+        displaymap = map;
         this._container = L.DomUtil.create('div', 'leaflet-control-postcodeposition');
         L.DomEvent.disableClickPropagation(this._container);
-        map.on('zoomend', this._onZoomEnd, this);
-        map.on('contextmenu', this._onRightClick, this);
-        this._container.innerHTML = this.options.defaultString;
+        displaymap.on('zoomend', this._onZoomEnd, this);
+        displaymap.on('contextmenu', this._onRightClick, this);
+        this._container.innerHTML = this.options.zoominString;
         return this._container;
     },
-    onRemove: function (map) {
-        map.off('zoomend', this._onZoomEnd);
-        map.off('contextmenu', this._onClick);
+    onRemove: function () {
+        displaymap.off('zoomend', this._onZoomEnd);
+        displaymap.off('contextmenu', this._onClick);
     },
     _onRightClick: function (e) {
-        var zoom = map.getZoom();
-        if (zoom > 12) {
-            displayPostcodes(e, map);
-        } else {
-            postcodelayer.clearLayers();
-            this._container.innerHTML = "Zoom in to view postcodes!";
-        }
+        displayPostcodes(e);
     },
     _onZoomEnd: function (e) {
-        var zoom = map.getZoom();
+        var zoom = ramblersMap.map.getZoom();
         if (zoom <= 12) {
-            this._container.innerHTML = "Zoom in and right click to see nearby postcodes";
+            this._container.innerHTML = this.options.zoominString;
             if (zoom <= 9) {
-                postcodelayer.clearLayers();
+                ramblersMap.postcodelayer.clearLayers();
             }
         } else {
-            this._container.innerHTML = "Right click to see nearby postcodes";
+            this._container.innerHTML = this.options.displayString;
         }
     }
 });

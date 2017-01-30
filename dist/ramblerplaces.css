@@ -236,3 +236,7 @@ input.link-button, .link-button-small a, .link-button a, link-button-small a{
     text-decoration: none;
     cursor: pointer;
 }
+/* leaflet/joomla fix so that overlay pane is displayed */
+.leaflet-overlay-pane svg{
+    max-width:none
+}

@@ -11,6 +11,7 @@
         <!-- Ramblers -->
         <link rel="stylesheet" href="dist/ramblerplaces.css" />
         <link rel="stylesheet" href="dist/mapdisplay.css" />
+        <script src="dist/ramblersleaflet.js" ></script>
         <script src="dist/ramblersplaces.js" ></script>
         <!--- Google maps -->
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCn7L6gy4ahGAk-GTwedKWj8G3k5tkYEqw" async defer></script>
@@ -36,144 +37,28 @@
         <script src="geodesy/latlon-ellipsoidal.js"></script>
         <script src="geodesy/osgridref.js"></script>
 
-        // [[Insert Analytics]]
+        <!--[[Insert Analytics]]--->
     </head>
     <body>
-        <div id="mapprogress"><div id="mapprogress-bar"></div></div> 
-        <div id="map-container" style="float:left,height:auto">
-            <div id="map"></div>
+        <div id="ra-cluster-progress"><div id="ra-cluster-progress-bar"></div></div> 
+        <div id="map-container" style="float:left,height:100%">
+            <div id="leafletmap" ></div>
         </div>
         <div class="maptopmenu">
-            // [[Insert menu]] 
+            <!--[[Insert menu]]---> 
         </div>
         <script>
-           
-            var point;
-            var map = new L.Map('map', {center: new L.LatLng(54.221592, -3.355007),
-                zoom: 5,
-                minZoom: 4,
-                maxBounds: new L.latLngBounds(L.latLng(49, -11), L.LatLng(62, 6)),
-                trackResize: true});
-            var roads = L.gridLayer.googleMutant({
-                type: 'roadmap' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-            });
-            var satellite = L.gridLayer.googleMutant({
-                type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-            });
-            var hybrid = L.gridLayer.googleMutant({
-                type: 'hybrid' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-            });
-            var terrain = L.gridLayer.googleMutant({
-                type: 'terrain' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-            });
-            var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> '}).addTo(map);
+<!--[[Add markers here]]--->
+            var L, document, ramblersMap;
+            ramblersMap = new RamblersLeafletMap('[[base]]');
+            ramblersMap.options.google = true;
+            ramblersMap.options.startingplaces = true;
+            ramblersMap.options.fullscreen = false;
 
-
-            mapLayers = {'Open Street Map': osm,
-                'Google': roads,
-                'Google Satellite': satellite,
-                'Google Hybrid': hybrid,
-                'Google Terrain': terrain
+            window.onload = function () {
+                raLoadLeaflet();
+                
             };
-
-            var progress = document.getElementById('mapprogress');
-            var progressBar = document.getElementById('mapprogress-bar');
-
-            function updateProgressBar(processed, total, elapsed, layersArray) {
-                if (elapsed > 1000) {
-                    // if it takes more than a second to load, display the progress bar:
-                    progress.style.display = 'block';
-                    progressBar.style.width = Math.round(processed / total * 100) + '%';
-                }
-
-                if (processed === total) {
-                    // all markers processed - hide the progress bar:
-                    progress.style.display = 'none';
-                }
-            }
-            var s0 = L.icon({
-                iconUrl: 'images/rejected.png',
-                iconSize: [15, 15]
-            });
-            var s1 = L.icon({
-                iconUrl: 'images/1star.png',
-                iconSize: [19, 19]
-            });
-            var s2 = L.icon({
-                iconUrl: 'images/2star.png',
-                iconSize: [21, 21]
-            });
-            var s3 = L.icon({
-                iconUrl: 'images/3star.png',
-                iconSize: [23, 23]
-            });
-            var s4 = L.icon({
-                iconUrl: 'images/4star.png',
-                iconSize: [25, 25]
-            });
-            var s5 = L.icon({
-                iconUrl: 'images/5star.png',
-                iconSize: [27, 27]
-            });
-
-            //      var markersCG = L.markerClusterGroup({chunkedLoading: true, chunkProgress: updateProgressBar, disableClusteringAtZoom: 12});
-            var markersCG = L.markerClusterGroup();
-
-
-            var mLst = [];
-            // [[Add markers here]]
-
-            markersCG.addLayers(mLst);
-            map.addLayer(markersCG);
-
-            // create an orange rectangle for grid squares
-            var gridsquare100 = L.rectangle([[84, -89], [84.00001, -89.000001]],
-                    {color: "#ff7800", weight: 1}).addTo(map);
-            var gridsquare10 = L.rectangle([[84, -89], [84.00001, -89.000001]],
-                    {color: "#884000", weight: 1}).addTo(map);
-            // add OS Grid squares to map
-            var osgrid = L.layerGroup([]);
-            osMapGrid(L, osgrid);
-            var overlayMaps = {
-                "OS 100Km Grid": osgrid
-            };
-            osgrid.addTo(map);
-            // add marker and layer group to contain postcode markers
-            postcodeIcon = L.icon({
-                iconUrl: 'images/postcode-icon.png',
-                iconSize: [24, 18], // size of the icon
-                shadowSize: [26, 20], // size of the shadow
-                iconAnchor: [12, 9], // point of the icon which will correspond to marker's location
-                shadowAnchor: [0, 0], // the same for the shadow
-                popupAnchor: [0, -12] // point from which the popup should open relative to the iconAnchor
-            });
-            postcodeIconClosest = L.icon({
-                iconUrl: 'images/postcode-icon-closest.png',
-                iconSize: [24, 18], // size of the icon
-                shadowSize: [26, 20], // size of the shadow
-                iconAnchor: [12, 9], // point of the icon which will correspond to marker's location
-                shadowAnchor: [0, 0], // the same for the shadow
-                popupAnchor: [0, -12] // point from which the popup should open relative to the iconAnchor
-            });
-            postcodelayer = L.featureGroup([]);
-            postcodelayer.addTo(map);
-            //
-
-            L.control.layers(mapLayers, overlayMaps, {collapsed: true}).addTo(map);
-            var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: true,
-                collapsed: true,
-                geocoder: L.Control.Geocoder.nominatim({
-                    geocodingQueryParams: {countrycodes: 'gb'}
-                })
-            }).addTo(map);
-
-            L.control.usageAgreement().addTo(map);
-            L.control.postcodeStatus().addTo(map);
-            L.control.mouse().addTo(map);
-            L.control.scale().addTo(map);
 
         </script>
 

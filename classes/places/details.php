@@ -24,7 +24,7 @@ class PlacesDetails {
         }
 
         echo "<span class='location'>Place Grid Ref: <b>" . $grdisp . "</b></span>";
-        echo "<span class='reportbutton-green'><a href=\"javascript:photos('" . $gr . "') \">Photos of area</a></span>";
+      //  echo "<span class='reportbutton-green'><a href=\"javascript:photos('" . $gr . "') \">Photos of area</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:streetmap('" . $gr . "') \">Streetmap</a></span>";
         echo "<span class='reportbutton-green'><a href=\"javascript:googlemap(" . $lat . "," . $long . ") \">Google Map</a></span>";
         echo "<p class='small'>Lat/Long: " . $lat . ", " . $long . "</p>";

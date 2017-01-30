@@ -6,7 +6,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-if (typeof module != 'undefined' && module.exports)
+if (typeof module !== 'undefined' && module.exports)
     var LatLon = require('./latlon-ellipsoidal.js'); // ≡ import LatLon from 'latlon-ellipsoidal.js'
 
 
@@ -67,7 +67,7 @@ OsGridRef.latLonToOsGrid = function (point) {
         throw new TypeError('point is not LatLon object');
 
     // if necessary convert to OSGB36 first
-    if (point.datum != LatLon.datum.OSGB36)
+    if (point.datum !== LatLon.datum.OSGB36)
         point = point.convertDatum(LatLon.datum.OSGB36);
 
     var φ = point.lat.toRadians();
@@ -184,7 +184,7 @@ OsGridRef.osGridToLatLon = function (gridref, datum) {
     var λ = λ0 + X * dE - XI * dE3 + XII * dE5 - XIIA * dE7;
 
     var point = new LatLon(φ.toDegrees(), λ.toDegrees(), LatLon.datum.OSGB36);
-    if (datum != LatLon.datum.OSGB36)
+    if (datum !== LatLon.datum.OSGB36)
         point = point.convertDatum(datum);
 
     return point;
@@ -235,15 +235,15 @@ OsGridRef.parse = function (gridref) {
     // skip grid letters to get numeric (easting/northing) part of ref
     var en = gridref.slice(2).trim().split(/\s+/);
     // if e/n not whitespace separated, split half way
-    if (en.length == 1)
+    if (en.length === 1)
         en = [en[0].slice(0, en[0].length / 2), en[0].slice(en[0].length / 2)];
 
     // validation
     if (e100km < 0 || e100km > 6 || n100km < 0 || n100km > 12)
         throw new Error('Invalid grid reference');
-    if (en.length != 2)
+    if (en.length !== 2)
         throw new Error('Invalid grid reference');
-    if (en[0].length != en[1].length)
+    if (en[0].length !== en[1].length)
         throw new Error('Invalid grid reference');
 
     // standardise to 10-digit refs (metres)
@@ -274,7 +274,7 @@ OsGridRef.prototype.toString = function (digits) {
         throw new Error('Invalid grid reference');
 
     // use digits = 0 to return numeric format (in metres)
-    if (digits == 0)
+    if (digits === 0)
         return e.pad(6) + ',' + n.pad(6);
 
     // get the 100km-grid indices
@@ -325,5 +325,5 @@ if (Number.prototype.pad === undefined) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-if (typeof module != 'undefined' && module.exports)
+if (typeof module !== 'undefined' && module.exports)
     module.exports = OsGridRef; // ≡ export default OsGridRef

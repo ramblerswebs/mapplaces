@@ -56,12 +56,14 @@ class PlacesDisplay {
     }
 
     public function display($menu) {
+        $base = Baseaddr::get();
         $template = new Template("dist/mapTemplate.html");
-        $template->replaceString("// [[Insert menu]]", $menu->getMenu(Null));
-        $template->replaceStringWithFile("// [[Insert Analytics]]", "analyticstracking.php");
+        $template->replaceString("[[base]]", $base);
+        $template->replaceString("<!--[[Insert menu]]--->", $menu->getMenu(Null));
+        $template->replaceStringWithFile("<!--[[Insert Analytics]]--->", "analyticstracking.php");
         $points = $this->getPlaces();
         //  $points = $this->db->getPlaces($this->stars, $this->agedate, $this->compare);
-        $template->replaceString("// [[Add markers here]]", $points);
+        $template->replaceString("<!--[[Add markers here]]--->", "function addContent(ramblersMap) {" . $points . "}");
         $template->displayTemplate();
     }
 

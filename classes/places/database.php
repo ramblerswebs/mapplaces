@@ -261,7 +261,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
                 if ($add AND $ageadd) {
 // echo "<br/>Date " . $lastused;
-                    $markers.= "addPlace(mLst,\"" . $gr . "\"," . $which . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
+                    $markers.= "addPlace(\"" . $gr . "\"," . $which . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
                 }
             }
             unset($result);

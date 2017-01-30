@@ -12,6 +12,8 @@
 
 error_reporting(-1);
 ini_set('display_errors', 'On');
+
+
 if (file_exists("config.php")) {
     require_once 'config.php';
 } else {
@@ -20,6 +22,10 @@ if (file_exists("config.php")) {
 
 require_once 'classes/autoload.php';
 Logfile::create("logfiles/testing.log");
+Baseaddr::set();
+
+echo Baseaddr::get();
+//echo "---------------------";
 $config = new Config();
 $db = new PlacesDatabase($config->database);
 $db->Connect();

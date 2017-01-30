@@ -155,8 +155,8 @@ Vector3d.prototype.length = function() {
  */
 Vector3d.prototype.unit = function() {
     var norm = this.length();
-    if (norm == 1) return this;
-    if (norm == 0) return this;
+    if (norm === 1) return this;
+    if (norm === 0) return this;
 
     var x = this.x/norm;
     var y = this.y/norm;
@@ -211,7 +211,7 @@ Vector3d.prototype.rotateAround = function(axis, theta) {
     var q = [
         [ a.x*a.x*(1-c) + c,     a.x*a.y*(1-c) - a.z*s, a.x*a.z*(1-c) + a.y*s],
         [ a.y*a.x*(1-c) + a.z*s, a.y*a.y*(1-c) + c,     a.y*a.z*(1-c) - a.x*s],
-        [ a.z*a.x*(1-c) - a.y*s, a.z*a.y*(1-c) + a.x*s, a.z*a.z*(1-c) + c    ],
+        [ a.z*a.x*(1-c) - a.y*s, a.z*a.y*(1-c) + a.x*s, a.z*a.z*(1-c) + c    ]
     ];
     // multiply q × p
     var qp = [0, 0, 0];
@@ -242,4 +242,4 @@ Vector3d.prototype.rotateAround = function(axis, theta) {
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-if (typeof module != 'undefined' && module.exports) module.exports = Vector3d; // ≡ export default Vector3d
+if (typeof module !== 'undefined' && module.exports) module.exports = Vector3d; // ≡ export default Vector3d
