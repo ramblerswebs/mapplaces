@@ -24,7 +24,7 @@ require_once 'classes/autoload.php';
 Logfile::create("logfiles/testing.log");
 Baseaddr::set();
 
-echo Baseaddr::get();
+//echo Baseaddr::get();
 //echo "---------------------";
 $config = new Config();
 $db = new PlacesDatabase($config->database);
