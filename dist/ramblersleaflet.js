@@ -40,9 +40,9 @@ function raLoadLeaflet() {
 
 
 // map types
-    ramblersMap.osm = new L.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    ramblersMap.osm = new L.TileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
-        attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a>"}).addTo(ramblersMap.map);
+        attribution: "Map data &copy; <a href=\"https://openstreetmap.org\">OpenStreetMap</a>"}).addTo(ramblersMap.map);
     if (ramblersMap.options.google) {
         ramblersMap.roads = L.gridLayer.googleMutant({
             type: "roadmap" // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
@@ -391,7 +391,7 @@ function displayPostcodes(e) {
 // get postcodes around this point       
             var east = Math.round(grid.easting);
             var north = Math.round(grid.northing);
-            var url = "http://postcodes.theramblers.org.uk/index.php?easting=" + east + "&northing=" + north + "&dist=10&maxpoints=20";
+            var url = "https://postcodes.theramblers.org.uk/index.php?easting=" + east + "&northing=" + north + "&dist=10&maxpoints=20";
             getJSON(url, function (err, items) {
                 if (err !== null) {
                     var msg = "Error: Something went wrong: " + err;

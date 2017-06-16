@@ -54,8 +54,17 @@ switch ($opts->gets("option")) {
         $stars[5] = $opts->gets("5star") == "1";
 
         $age = $opts->gets("age");
-        $display = new PlacesDisplay($db, $stars, $age);
-        $display->display($menu);
+        switch ($age) {
+            case "5years":
+            case "3years":
+            case "1years":
+            case "5older":
+                $display = new PlacesDisplay($db, $stars, $age);
+                $display->display($menu);
+                break;
+            default:
+                break;
+        }
         break;
     case "details":
         $display = new PlacesDetails($db);
