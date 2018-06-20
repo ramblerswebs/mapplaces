@@ -246,10 +246,12 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $lastused = $row[4];
                 $which = intval($no + .5);
                 $icon = PlacesFunctions::getStarMarker($which);
-                If ($which < 0)
+                If ($which < 0) {
                     $which = 0;
-                If ($which > 5)
+                }
+                If ($which > 5) {
                     $which = 5;
+                }
                 $add = $stars[$which];
                 $ageadd = false;
                 if ($compare == "older") {
@@ -270,6 +272,67 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
+    public function getPlacesRecords($agedate, $compare, $easting, $northing, $distance, $maxpoints) {
+
+        $east1 = $easting - $distance;
+        $east2 = $easting + $distance;
+        $north1 = $northing - $distance;
+        $north2 = $northing + $distance;
+        $OSRef1 = new PHPCoord\OSRef($east1, $north1); //Easting, Northing
+        $LatLng1 = $OSRef1->toLatLng();
+        $OSRef2 = new PHPCoord\OSRef($east2, $north2); //Easting, Northing
+        $LatLng2 = $OSRef2->toLatLng();
+
+
+        $lat1 = $LatLng1->getLat();
+        $long1 = $LatLng1->getLng();
+        $lat2 = $LatLng2->getLat();
+        $long2 = $LatLng2->getLng();
+        $where = "latitude>" . $lat1 . " AND latitude <" . $lat2;
+        $where.=" AND longitude>" . $long1 . " AND longitude <" . $long2;
+        $locations = [];
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places WHERE dateused <= CURDATE() AND " . $where . " GROUP BY gridref";
+        $query = str_replace("[Period]", self::VALIDPERIOD, $query);
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
+        }
+        if ($ok === true) {
+            $result = parent::getResult();
+            /* fetch object array */
+            while ($row = $result->fetch_row()) {
+//  printf("%s %s %s (%s)\r\n", $row[0], $row[1],$row[2],$row[3]);
+                $gr = $row[0];
+                $lat = $row[1];
+                $long = $row[2];
+                $no = $row[3];
+                $lastused = $row[4];
+                $which = intval($no + .5);
+                $icon = PlacesFunctions::getStarMarker($which);
+                If ($which < 0) {
+                    $which = 0;
+                }
+                If ($which > 5) {
+                    $which = 5;
+                }
+                $ageadd = false;
+                if ($compare == "older") {
+                    $ageadd = $lastused <= $agedate;
+                }
+                if ($compare == "newer") {
+                    $ageadd = $lastused >= $agedate;
+                }
+
+                if ($ageadd) {
+// echo "<br/>Date " . $lastused;
+                    $locations[$gr] = new PlacesRecord($lat, $long, $which);
+                }
+            }
+
+            return $locations;
+        }
+    }
+
     public function getDetails($id) {
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
@@ -284,7 +347,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             /* fetch object array */
             echo "<p><b>Description</b> [Date used / Score]</p><ul>";
             $i = 0;
-            while ($row = $result->fetch_row()) {             
+            while ($row = $result->fetch_row()) {
                 $desc = $row[0];
                 $score = $row[2];
                 $lastread = $row[1];
@@ -301,7 +364,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
                 $i+=1;
                 if ($i > 10) {
-                   break;
+                    break;
                 }
                 echo "<li><span class='small'>" . $desc . " [" . $lastread . " / " . $totscore . "%]</span></li>";
             }

@@ -28,17 +28,17 @@ class RamblersOrganisationGroup {
     public function listGroup() {
         switch ($this->scope) {
             case "A":
-                echo "<p>Area: " . $this->name . " (" . $this->code . ")</p>";
+                echo "Area: " . $this->name . " (" . $this->code . ")".PHP_EOL;
                 break;
             case "G":
-                echo "<p>\tGroup: " . $this->name . " (" . $this->code . ")</p>";
+                echo "\tGroup: " . $this->name . " (" . $this->code . ")".PHP_EOL;
                 break;
             case "S":
-                echo "<p>\tSpecial Group: " . $this->name . " (" . $this->code . ")</p>";
+                echo "\tSpecial Group: " . $this->name . " (" . $this->code . ")".PHP_EOL;
                 break;
 
             default:
-                echo "<p>Unknown Group type: " . $this->name . " (" . $this->code . ")</p>";
+                echo "Unknown Group type: " . $this->name . " (" . $this->code . ")".PHP_EOL;
                 break;
         }
     }

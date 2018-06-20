@@ -66,5 +66,4 @@ class PlacesDisplay {
         $template->replaceString("<!--[[Add markers here]]--->", "function addContent(ramblersMap) {" . $points . "}");
         $template->displayTemplate();
     }
-
 }

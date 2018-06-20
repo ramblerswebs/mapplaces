@@ -11,7 +11,7 @@
  *
  * @author Chris
  */
-class PostcodesEmail {
+class PlacesEmail {
 
     public static function send($subtitle, $text) {
         $email = "admin@walkinginfo.co.uk";

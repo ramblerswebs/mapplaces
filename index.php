@@ -3,7 +3,7 @@
 // options
 // index.php normal splash page
 // index.php?option=display map display page
-// task.php scheduled task to retrieve walks json fee
+// task.php scheduled task to retrieve walks json feed
 // index.php?option=details display details of a location
 // index.php?option=report report a problem with a location (gridref)
 // index.php?option=processReport process report about location girdref
