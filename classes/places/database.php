@@ -180,13 +180,17 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $latitude = $row[3];
                 $longitude = $row[4];
                 $no = $row[5];
-                $this->addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude);
+                $isok = $this->addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude);
+                If (!$isok) {
+                    return false;
+                }
             }
         } else {
-            echo "ERROR: Unable to read database record";
+            return false;
         }
         unset($result);
         parent::freeResult();
+        return true;
     }
 
     public function addExtraPlace($type, $gridref, $score, $description, $easting, $northing, $latitude, $longitude) {
@@ -219,10 +223,11 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $values[] = $today->format("Y-m-d");
             $ok = parent::insertRecord("places", $names, $values);
             if ($ok) {
-                echo "Accepted: ";
+                
             } else {
                 $this->addErrorLog(parent::error());
             }
+            return $ok;
         }
     }
 
@@ -324,8 +329,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 }
 
                 if ($ageadd) {
-// echo "<br/>Date " . $lastused;
-                    $locations[$gr] = new PlacesRecord($lat, $long, $which);
+                    $locations[] = new PlacesRecord($gr, $lat, $long, $which);
                 }
             }
 
@@ -371,6 +375,50 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             echo "</ul>";
             unset($result);
             parent::freeResult();
+        }
+    }
+
+    public function getDetailsArray($id) {
+        $today = new DateTime("now");
+        $todays = $today->format("Y-m-d");
+        $query = "SELECT name,dateused,score FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
+        $query = str_replace("[todays]", $todays, $query);
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
+        }
+        if ($ok == true) {
+            $result = parent::getResult();
+            /* fetch object array */
+            $i = 0;
+            $out = [];
+            while ($row = $result->fetch_row()) {
+                $desc = $row[0];
+                $score = $row[2];
+                $lastread = $row[1];
+                $datetime1 = new DateTime();
+                $datetime2 = new DateTime($lastread);
+                $interval = $datetime1->diff($datetime2);
+                $days = $interval->format("%a");
+                $per = max((self::VALIDPERIOD - $days) / self::VALIDPERIOD, 0) * 100;
+                $per = intval($per);
+                $totscore = ceil($score * $per);
+
+                $i+=1;
+                if ($i > 10) {
+                    break;
+                }
+                $record = [];
+                $record['desc'] = $desc;
+                $record['lastread'] = $lastread;
+                $record['score'] = $totscore;
+
+                $out[] = $record;
+            }
+
+            unset($result);
+            parent::freeResult();
+            return $out;
         }
     }
 

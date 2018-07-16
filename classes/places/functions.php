@@ -126,14 +126,21 @@ class PlacesFunctions {
       public static function sortOnDistance($array) {
 
         function cmp($a, $b) {
-            if ($a->Distance == $b->Distance) {
+            if ($a->D == $b->D) {
                 return 0;
             }
-            return ($a->Distance < $b->Distance) ? -1 : 1;
+            return ($a->D < $b->D) ? -1 : 1;
         }
 
         usort($array, "cmp");
         return $array;
+    }
+    public static function getUserIP(){
+        $user=$_SERVER['REMOTE_ADDR'];
+        if ($user==null || $user==""){
+            $user="Unknown IP";
+        }
+        return $user;
     }
     
 

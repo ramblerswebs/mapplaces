@@ -21,17 +21,17 @@ class PlacesReportform {
     }
 
     function display() {
-        //echo "report form";
+//echo "report form";
         $template = new Template("dist/formTemplate.html");
         $template->replaceString("[typeValue]", $this->reporttype);
         $template->replaceString("[grValue]", $this->gridref);
-       // if ($this->reporttype == PlacesReportform::eDesc) {
-       //     $template->replaceString("[title]", "New Description");
-       //    $template->replaceString("[textValue]", "");
-       // } else {
-           $template->replaceString("[title]", "Confirm location/grid reference is not correct  ");
-           $template->replaceString("[textValue]", "Incorrect grid ref");
-       // }
+// if ($this->reporttype == PlacesReportform::eDesc) {
+//     $template->replaceString("[title]", "New Description");
+//    $template->replaceString("[textValue]", "");
+// } else {
+        $template->replaceString("[title]", "Confirm location/grid reference is not correct  ");
+        $template->replaceString("[textValue]", "Incorrect grid ref");
+// }
         $template->displayTemplate();
     }
 
@@ -43,7 +43,25 @@ class PlacesReportform {
             $score = -1; // gridref
         }
         $type = PlacesEnums::FromUserReport;
-        $this->db->addReport($type, $this->gridref, $score, $desc);
+        $ok = $this->db->addReport($type, $this->gridref, $score, $desc);
+        if ($ok) {
+            echo "Accepted";
+        } else {
+            echo "ERROR: Unable to read database record";
+        }
+    }
+
+    function reportButton() {
+        if ($this->reporttype == "like") {
+            $desc = "User like " . PlacesFunctions::getUserIP();
+            $score = 1;
+        } else {
+            $desc = "Used dislike " .PlacesFunctions::getUserIP();
+            $score = -1; // gridref
+        }
+        $type = PlacesEnums::FromUserReport;
+        $ok = $this->db->addReport($type, $this->gridref, $score, $desc);
+        return $ok;
     }
 
 }
