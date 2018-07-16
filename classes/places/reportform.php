@@ -52,16 +52,20 @@ class PlacesReportform {
     }
 
     function reportButton() {
+        $score = '';
         if ($this->reporttype == "like") {
             $desc = "User like " . PlacesFunctions::getUserIP();
             $score = 1;
-        } else {
-            $desc = "Used dislike " .PlacesFunctions::getUserIP();
+        }
+        if ($this->reporttype == "dislike") {
+            $desc = "User dislike " . PlacesFunctions::getUserIP();
             $score = -1; // gridref
         }
-        $type = PlacesEnums::FromUserReport;
-        $ok = $this->db->addReport($type, $this->gridref, $score, $desc);
-        return $ok;
+        If ($score !== 0) {
+            $type = PlacesEnums::FromUserReport;
+            $ok = $this->db->addReport($type, $this->gridref, $score, $desc);
+            return $ok;
+        }
     }
 
 }
