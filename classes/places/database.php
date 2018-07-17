@@ -381,7 +381,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
     public function getDetailsArray($id) {
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
-        $query = "SELECT name,dateused,score FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
+        $query = "SELECT name,dateused,score,type FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
         $query = str_replace("[todays]", $todays, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -391,11 +391,14 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $result = parent::getResult();
             /* fetch object array */
             $i = 0;
-            $out = [];
+            $like = 0;
+            $dislike = 0;
+            $out = new PlacesJsonrecords();
             while ($row = $result->fetch_row()) {
                 $desc = $row[0];
                 $score = $row[2];
                 $lastread = $row[1];
+                $type = $row[3];
                 $datetime1 = new DateTime();
                 $datetime2 = new DateTime($lastread);
                 $interval = $datetime1->diff($datetime2);
@@ -408,12 +411,21 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 if ($i > 10) {
                     break;
                 }
-                $record = [];
-                $record['desc'] = $desc;
-                $record['lastread'] = $lastread;
-                $record['score'] = $totscore;
+                if ($type == PlacesEnums::FromUserReport) {
+                    // add like and dislikes
+                    If ($score == 1) {
+                        $out->likes+=1;
+                    } else {
+                        $out->dislikes+=1;
+                    }
+                } else {
+                    $record = [];
+                    $record['desc'] = $desc;
+                    $record['lastread'] = $lastread;
+                    $record['score'] = $totscore;
 
-                $out[] = $record;
+                    $out->records[] = $record;
+                }
             }
 
             unset($result);
