@@ -9,8 +9,11 @@ class RamblersOrganisationGroups {
 
     private $mgroups;
     private $db;
-
+ 
     const ORGFEED = "feed/organisation.json";
+    //const ORGFEEDURL = "https://www.ramblers.org.uk/api/lbs/groups/";
+    const ORGFEEDURL = "https://groups.theramblers.org.uk/";
+
 
     public function __construct($db) {
         $this->db = $db;
@@ -56,10 +59,9 @@ class RamblersOrganisationGroups {
     }
 
     private function readGroupCodesFeed() {
-        $url = "http://www.ramblers.org.uk/api/lbs/groups/";
-
+        
         // Get the JSON information
-        $groupsjson = file_get_contents($url);
+        $groupsjson = file_get_contents(self::ORGFEEDURL);
         $groups = [];
         $this->mgroups = array();
         if ($groupsjson != "") {

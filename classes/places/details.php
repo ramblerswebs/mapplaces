@@ -14,7 +14,7 @@ class PlacesDetails {
     }
 
     function display($no, $gr, $lat, $long) {
- 
+
         $image = PlacesFunctions::getStarsImageUrl($no);
         echo "<img width=\"100\" height=\"20\" alt=\"stars\" src=\"" . $image . "\">";
         echo "<p>";
@@ -43,9 +43,10 @@ class PlacesDetails {
         echo "</p>";
         echo "</div>";
     }
+
     function displayNew($gr) {
-            $arr=$this->db->getDetailsArray($gr);
-   return $arr;
+        $arr = $this->db->getDetailsArray($gr);
+        return $arr;
     }
 
 }

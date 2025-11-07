@@ -16,8 +16,8 @@ class PlacesDatabase extends Database {
   `description` varchar(2560) NOT NULL,
   `scope` text NOT NULL,
   `url` varchar(500) NOT NULL,
-  `latitude` float NOT NULL,
-  `longitude` float NOT NULL
+  `latitude` double NOT NULL,
+  `longitude` double NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;        
 ", "
 CREATE TABLE `errorlog` (
@@ -36,9 +36,8 @@ CREATE TABLE `places` (
   `gridref` text NOT NULL,
   `northing` int(11) NOT NULL,
   `easting` int(11) NOT NULL,
-  `longitude` float NOT NULL DEFAULT '0',
-  `latitude` float NOT NULL DEFAULT '0',
-  `extras` blob NOT NULL,
+  `longitude` double NOT NULL DEFAULT '0',
+  `latitude` double NOT NULL DEFAULT '0',
   `score` smallint(6) NOT NULL DEFAULT '1',
   `dateused` date DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -121,12 +120,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $this->addErrorLog(parent::error());
         }
 // insert new record
-        $extras = new PlacesExtras;
-        $extras->group = $walk->groupCode;
-        $extras->postcode = $point->postcode;
-        $extras->latitude = $point->postcodeLatitude;
-        $extras->longitude = $point->postcodeLongitude;
-
+        
         $names = array();
         $names[] = "walkid";
         $names[] = "type";
@@ -136,21 +130,20 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         $names[] = "northing";
         $names[] = "longitude";
         $names[] = "latitude";
-        $names[] = "extras";
         $names[] = "dateused";
         $names[] = "score";
         $gr = PlacesFunctions::checkGridRef($point->gridRef);
         $values = array();
         $values[] = $id;
         $values[] = $type;
-        $values[] = $point->description;
+        // limit name to 250 chars
+        $values[] = substr($point->description, 0, 250);
         $values[] = $gr;
         $values[] = $point->easting;
         $values[] = $point->northing;
         $values[] = $point->longitude;
         $values[] = $point->latitude;
-        $values[] = json_encode($extras);
-        $values[] = $walk->date;
+        $values[] = $walk->walkDate->format("Y-m-d");
         $score = 1;
         if (strlen($gr) <> 8) {
             $score = -1;
@@ -212,7 +205,8 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
             $names[] = "dateused";
             $values = array();
             $values[] = $type;
-            $values[] = $description;
+            // limit name to 250 chars
+            $values[] = substr($description, 0, 250);
             $values[] = $score;
             $values[] = $gridref;
             $values[] = $easting;
@@ -233,7 +227,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
     public function getPlaces($stars, $agedate, $compare) {
         $markers = "";
-        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places WHERE dateused <= CURDATE() GROUP BY gridref";
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places GROUP BY gridref";
         $query = str_replace("[Period]", self::VALIDPERIOD, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -268,7 +262,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
                 if ($add AND $ageadd) {
 // echo "<br/>Date " . $lastused;
-                    $markers.= "addPlace(\"" . $gr . "\"," . $which . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
+                    $markers .= "addPlace(\"" . $gr . "\"," . $which . "," . number_format($lat, 6, '.', '') . "," . number_format($long, 6, '.', '') . "," . $icon . ");\r\n";
                 }
             }
             unset($result);
@@ -277,7 +271,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
-    public function getPlacesRecords($agedate, $compare, $easting, $northing, $distance, $maxpoints) {
+    public function getPlacesRecords($agedate, $compare, $easting, $northing, $distance) {
 
         $east1 = $easting - $distance;
         $east2 = $easting + $distance;
@@ -288,15 +282,14 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         $OSRef2 = new PHPCoord\OSRef($east2, $north2); //Easting, Northing
         $LatLng2 = $OSRef2->toLatLng();
 
-
         $lat1 = $LatLng1->getLat();
         $long1 = $LatLng1->getLng();
         $lat2 = $LatLng2->getLat();
         $long2 = $LatLng2->getLng();
         $where = "latitude>" . $lat1 . " AND latitude <" . $lat2;
-        $where.=" AND longitude>" . $long1 . " AND longitude <" . $long2;
+        $where .= " AND longitude>" . $long1 . " AND longitude <" . $long2;
         $locations = [];
-        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places WHERE dateused <= CURDATE() AND " . $where . " GROUP BY gridref";
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places WHERE " . $where . " GROUP BY gridref";
         $query = str_replace("[Period]", self::VALIDPERIOD, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -337,10 +330,43 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
         }
     }
 
+    public function getAllPlaces($agedate) {
+
+        $locations = [];
+        $query = "SELECT gridref,AVG(latitude),AVG(longitude),SUM(score*GREATEST(([Period]+DATEDIFF(dateused,CURDATE()))/[Period],0)) as total,MAX(dateused) FROM places GROUP BY gridref";
+        $query = str_replace("[Period]", self::VALIDPERIOD, $query);
+        $ok = parent::runQuery($query);
+        if (!$ok) {
+            $this->addErrorLog(parent::error());
+        }
+        if ($ok === true) {
+            $result = parent::getResult();
+            while ($row = $result->fetch_row()) {
+                $gr = $row[0];
+                $lat = $row[1];
+                $long = $row[2];
+                $no = $row[3];
+                $lastused = $row[4];
+                $which = intval($no + .5);
+                If ($which >= 0) {
+                    If ($which > 5) {
+                        $which = 5;
+                    }
+                    $ageadd = $lastused >= $agedate;
+                    if ($ageadd) {
+                        $locations[] = new PlacesRecord($gr, $lat, $long, $which);
+                    }
+                }
+            }
+
+            return $locations;
+        }
+    }
+
     public function getDetails($id) {
         $today = new DateTime("now");
         $todays = $today->format("Y-m-d");
-        $query = "SELECT name,dateused,score FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
+        $query = "SELECT name,dateused,score FROM places WHERE gridref='" . $id . "' ORDER BY dateused DESC";
         $query = str_replace("[todays]", $todays, $query);
         $ok = parent::runQuery($query);
         if (!$ok) {
@@ -366,7 +392,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                     $desc = "<span class='noDesc'>[No description]</span>";
                 }
 
-                $i+=1;
+                $i += 1;
                 if ($i > 10) {
                     break;
                 }
@@ -379,10 +405,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
     }
 
     public function getDetailsArray($id) {
-        $today = new DateTime("now");
-        $todays = $today->format("Y-m-d");
-        $query = "SELECT name,dateused,score,type FROM places WHERE gridref='" . $id . "' AND dateused <= '[todays]' ORDER BY dateused DESC";
-        $query = str_replace("[todays]", $todays, $query);
+        $query = "SELECT name,dateused,score,type,latitude,longitude FROM places WHERE gridref='" . $id . "' ORDER BY dateused DESC";
         $ok = parent::runQuery($query);
         if (!$ok) {
             $this->addErrorLog(parent::error());
@@ -399,6 +422,8 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $score = $row[2];
                 $lastread = $row[1];
                 $type = $row[3];
+                $latitude = $row[4];
+                $longitude = $row[5];
                 $datetime1 = new DateTime();
                 $datetime2 = new DateTime($lastread);
                 $interval = $datetime1->diff($datetime2);
@@ -407,22 +432,24 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
                 $per = intval($per);
                 $totscore = ceil($score * $per);
 
-                $i+=1;
+                $i += 1;
                 if ($i > 10) {
                     break;
                 }
                 if ($type == PlacesEnums::FromUserReport) {
                     // add like and dislikes
                     If ($score == 1) {
-                        $out->likes+=1;
+                        $out->likes += 1;
                     } else {
-                        $out->dislikes+=1;
+                        $out->dislikes += 1;
                     }
                 } else {
                     $record = [];
                     $record['desc'] = $desc;
                     $record['lastread'] = $lastread;
                     $record['score'] = $totscore;
+                    $record['latitude'] = $latitude;
+                    $record['longitude'] = $longitude;
 
                     $out->records[] = $record;
                 }
@@ -444,7 +471,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
 
     public function removeMultipleLocations() {
         // find number of records for each location
-        $query = "SELECT gridref,COUNT(*) FROM places WHERE dateused <= CURDATE() GROUP BY gridref";
+        $query = "SELECT gridref,COUNT(*) FROM places GROUP BY gridref";
         $ok = parent::runQuery($query);
         if (!$ok) {
             $this->addErrorLog(parent::error());
@@ -466,7 +493,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;"];
     }
 
     private function removeLocation($gr, $no) {
-        $query = "DELETE FROM `places` WHERE `gridref`='[gridref]' AND dateused <= CURDATE() ORDER BY `dateused` LIMIT [limit] ";
+        $query = "DELETE FROM `places` WHERE `gridref`='[gridref]' ORDER BY `dateused` LIMIT [limit] ";
         $query = str_replace("[gridref]", $gr, $query);
         $query = str_replace("[limit]", $no, $query);
         $ok = parent::runQuery($query);

@@ -1,5 +1,9 @@
 <?php
 
+//
+// Process walks to retrieve meeting and start locations and add them to the database
+//
+
 error_reporting(-1);
 ini_set('display_errors', 'On');
 $exepath = dirname(__FILE__);
@@ -13,12 +17,19 @@ if (file_exists("config.php")) {
     require_once 'configtest.php';
 }
 require_once 'classes/autoload.php';
+spl_autoload_register('autoload');
+include "PHPCoord-2.1/TransverseMercator.php";
+include "PHPCoord-2.1/LatLng.php";
+include "PHPCoord-2.1/OSRef.php";
+include "PHPCoord-2.1/RefEll.php";
+$cc=get_declared_classes();
 
 $config = new Config();
 $db = new PlacesDatabase($config->database);
 $db->connect();
 if (!$db->connected()) {
     PlacesEmail::send("Task: Unable to connect to database", $db->error());
+    die();
 }
 
 $groups = new RamblersOrganisationGroups($db);
@@ -32,16 +43,21 @@ while ($i <= 4) {
     $lastupdated = RamblersFeedWalks::getDateFileLastUpdated($nextArea->getCode());
     $yesterday = new DateTime("yesterday");
     if ($lastupdated < $yesterday) {
-        echo "<p>Processing Area: " . $nextArea->getCode() . "</p>";
+        echo "<details>";
+        echo "<summary>Processing of Area: " . $nextArea->getCode() . "</summary>\r\n";
         $update = new PlacesUpdate($db, $nextArea);
         $update->processFeed();
+         echo "</details>";
     } else {
-         echo "<p>Area: " . $nextArea->getCode() . " already processed today</p>";
+         echo "<p>Area: " . $nextArea->getCode() . " already processed today</p>\r\n";
     }       
     $control->updateLastAreaProcessed($nextArea);
 }
 // remove items over 10 years old
 $db->removeOldLocationRecords();
-// remove items were count is over 20
+// remove items where count is over 20
 $db->removeMultipleLocations();
 $db->closeConnection();
+// getall cache is now invalid
+$cache = new Cache('getall');
+$cache->deleteCachedString();
