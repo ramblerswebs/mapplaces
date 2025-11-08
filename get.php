@@ -1,5 +1,7 @@
 <?php
 
+// return ALL places that have a positive score and are within a defined distance of a location
+
 error_reporting(-1);
 ini_set('display_errors', 'On');
 $exepath = dirname(__FILE__);
@@ -13,6 +15,7 @@ if (file_exists("config.php")) {
     require_once 'configtest.php';
 }
 require_once 'classes/autoload.php';
+spl_autoload_register('autoload');
 include "PHPCoord-2.1/TransverseMercator.php";
 include "PHPCoord-2.1/LatLng.php";
 include "PHPCoord-2.1/OSRef.php";
@@ -34,8 +37,9 @@ if ($distance == false) {
 $maxpoints = $opts->gets("maxpoints");
 $age = PlacesFunctions::getAgeDate("5years");
 $OSRef = new PHPCoord\OSRef($easting, $northing); //Easting, Northing
+
 $LatLng = $OSRef->toLatLng();
-$locations = $db->getPlacesRecords($age, "newer", $easting, $northing, $distance * 1000, $maxpoints);
+$locations = $db->getPlacesRecords($age, "newer", $easting, $northing, $distance * 1000);
 foreach ($locations as $location) {
     $location->D = PlacesFunctions::distance($LatLng->getLat(), $LatLng->getLng(), $location->Lat, $location->Lng);
     $location->D = number_format($location->D, 1, '.', '');

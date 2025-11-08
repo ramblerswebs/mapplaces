@@ -1,5 +1,7 @@
 <?php
 
+// return the detailed records for a place
+
 error_reporting(-1);
 ini_set('display_errors', 'On');
 $exepath = dirname(__FILE__);
@@ -13,6 +15,7 @@ if (file_exists("config.php")) {
     require_once 'configtest.php';
 }
 require_once 'classes/autoload.php';
+spl_autoload_register('autoload');
 
 $config = new Config();
 $db = new PlacesDatabase($config->database);
@@ -21,7 +24,6 @@ if (!$db->connected()) {
     PlacesEmail::send("Task: Unable to connect to database", $db->error());
 }
 $opts = new Options();
-
 $display = new PlacesDetails($db);
 $out=$display->displayNew( $opts->gets("gr"));
 $db->closeConnection();

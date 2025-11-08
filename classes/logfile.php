@@ -20,7 +20,7 @@ class Logfile {
     }
 
     public static function writeWhen($text) {
-        $today = new DateTime(NULL);
+        $today = new DateTime('now');
         $when = $today->format('Y-m-d H:i:s');
         self::write($when . ": " . $text);
     }
